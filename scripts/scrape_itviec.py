@@ -35,6 +35,7 @@ from config import (
     MAX_PAGES_DEFAULT, QUALITY_THRESHOLDS, REQUEST_DELAY, REQUEST_TIMEOUT,
 )
 from csv_writer import upsert_rows
+from fetcher import PlaywrightFetcher, fetch_with_requests
 
 logging.basicConfig(
     level=logging.INFO,
@@ -74,17 +75,11 @@ def parse_salary(raw: str) -> tuple[Optional[float], Optional[float]]:
 
 
 # -----------------------------------------------------------------------------
-# HTTP fetch
+# HTTP fetch wrapper (legacy - giữ để backward compatible với test cũ)
 # -----------------------------------------------------------------------------
 def fetch_page(url: str) -> Optional[str]:
-    """GET 1 URL, trả về HTML hoặc None nếu lỗi."""
-    try:
-        resp = requests.get(url, headers=HTTP_HEADERS, timeout=REQUEST_TIMEOUT)
-        resp.raise_for_status()
-        return resp.text
-    except requests.RequestException as err:
-        log.error("Lỗi tải %s: %s", url, err)
-        return None
+    """Wrapper gọi engine 'requests' để giữ tương thích."""
+    return fetch_with_requests(url)
 
 
 # -----------------------------------------------------------------------------
@@ -152,51 +147,80 @@ def parse_job_card(card) -> Optional[Dict]:
     }
 
 
-def scrape_itviec(target_date: date, max_pages: int) -> List[Dict]:
+def _parse_page(html: str) -> List[Dict]:
+    """Parse 1 trang HTML, trả về list job dict (chưa gắn scrape_date)."""
+    soup = BeautifulSoup(html, "html.parser")
+    cards = (
+        soup.find_all("div", class_=re.compile(r"job.?card|ipy-3"))
+        or soup.find_all("section", class_=re.compile("job"))
+        or soup.find_all("article")
+    )
+    jobs = []
+    for card in cards:
+        try:
+            job = parse_job_card(card)
+            if job:
+                jobs.append(job)
+        except Exception as err:
+            log.warning("Lỗi parse card: %s", err)
+    return jobs
+
+
+def scrape_itviec(
+    target_date: date,
+    max_pages: int,
+    engine: str = "playwright",
+) -> List[Dict]:
     """
-    Lặp qua các trang ItViec và bóc danh sách job.
-    Trả về list các dict đã gắn scrape_date.
+    Lặp qua các trang ItViec, hỗ trợ 2 engine:
+        - 'playwright' (mặc định): vượt Cloudflare, an toàn cho production.
+        - 'requests':              nhanh hơn, nhưng dễ bị 403.
+
+    Khi engine='playwright' bị fail liên tục, tự fallback sang 'requests'.
     """
-    log.info("═══ ItViec scrape — %s (tối đa %d trang) ═══", target_date, max_pages)
+    log.info("═══ ItViec scrape — %s | engine=%s | tối đa %d trang ═══",
+             target_date, engine, max_pages)
 
     all_jobs: List[Dict] = []
 
-    for page in range(1, max_pages + 1):
-        url = f"{ITVIEC_JOBS}?page={page}"
-        html = fetch_page(url)
-        if not html:
-            log.warning("Trang %d lỗi, bỏ qua.", page)
-            continue
+    if engine == "playwright":
+        # Mở 1 browser session, dùng chung cho mọi trang
+        try:
+            with PlaywrightFetcher() as fetcher:
+                for page_num in range(1, max_pages + 1):
+                    url = f"{ITVIEC_JOBS}?page={page_num}"
+                    html = fetcher.fetch(url)
+                    page_jobs = _parse_page(html) if html else []
+                    for job in page_jobs:
+                        job["scrape_date"] = target_date.isoformat()
+                    all_jobs.extend(page_jobs)
+                    log.info("Trang %2d: thu %d job", page_num, len(page_jobs))
 
-        soup = BeautifulSoup(html, "html.parser")
+                    # Nếu trang đầu đã rỗng -> dừng sớm (có thể bị block)
+                    if page_num == 1 and not page_jobs:
+                        log.warning("Trang 1 rỗng -> dừng, thử fallback 'requests'")
+                        break
+                    time.sleep(REQUEST_DELAY)
+        except ImportError:
+            log.error("Playwright chưa được cài. Chạy: pip install playwright "
+                      "&& playwright install chromium")
+            engine = "requests"     # fallback
 
-        # Tìm card theo nhiều layout khác nhau
-        cards = (
-            soup.find_all("div", class_=re.compile(r"job.?card|ipy-3"))
-            or soup.find_all("section", class_=re.compile("job"))
-            or soup.find_all("article")
-        )
+        # Fallback nếu Playwright không thu được gì
+        if not all_jobs:
+            log.warning("Playwright không thu được job -> thử lại bằng requests")
+            engine = "requests"
 
-        if not cards:
-            log.info("Trang %d không có job card -> dừng.", page)
-            break
-
-        page_jobs = 0
-        for card in cards:
-            try:
-                job = parse_job_card(card)
-                if not job:
-                    continue
+    if engine == "requests" and not all_jobs:
+        for page_num in range(1, max_pages + 1):
+            url = f"{ITVIEC_JOBS}?page={page_num}"
+            html = fetch_with_requests(url)
+            page_jobs = _parse_page(html) if html else []
+            for job in page_jobs:
                 job["scrape_date"] = target_date.isoformat()
-                all_jobs.append(job)
-                page_jobs += 1
-            except Exception as err:
-                log.warning("Lỗi parse card: %s", err)
-
-        log.info("Trang %2d: thu %d job", page, page_jobs)
-
-        # Nghỉ giữa các trang
-        time.sleep(REQUEST_DELAY)
+            all_jobs.extend(page_jobs)
+            log.info("Trang %2d: thu %d job", page_num, len(page_jobs))
+            time.sleep(REQUEST_DELAY)
 
     log.info("─" * 60)
     log.info("Tổng cộng: %d job", len(all_jobs))
@@ -213,11 +237,15 @@ def main() -> int:
                         help="Số trang tối đa cần cào")
     parser.add_argument("--date", help="Ngày scrape YYYY-MM-DD (mặc định: hôm nay VN)")
     parser.add_argument("--dry-run", action="store_true", help="Không ghi CSV")
+    parser.add_argument(
+        "--engine", choices=["playwright", "requests"], default="playwright",
+        help="Engine fetch HTML. 'playwright' vượt Cloudflare (mặc định).",
+    )
     args = parser.parse_args()
 
     target_date = date.fromisoformat(args.date) if args.date else today_vn()
 
-    rows = scrape_itviec(target_date, max_pages=args.pages)
+    rows = scrape_itviec(target_date, max_pages=args.pages, engine=args.engine)
 
     if not rows:
         log.error("KHÔNG thu được job nào - thoát với exit code 2")

@@ -39,10 +39,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run scraper
+      - name: Install Playwright Chromium
+        # --with-deps tự cài các thư viện hệ thống cần thiết (libnss3, libatk...)
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run scraper (Playwright engine để vượt Cloudflare)
         env:
           PAGES: ${{ github.event.inputs.pages || '30' }}
-        run: python scripts/scrape_itviec.py --pages "$PAGES"
+        run: python scripts/scrape_itviec.py --pages "$PAGES" --engine playwright
         # Không fail workflow nếu scrape thiếu - job quality sẽ alert
         continue-on-error: true
 

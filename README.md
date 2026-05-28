@@ -120,12 +120,15 @@ sqlite3 data/clean/skills.db < sql/queries.sql
 
 ## Lưu ý kỹ thuật
 
-- **ItViec chống bot**: Một số IP (Cloudflare datacenter, container) có thể bị
-  ItViec trả 403. Trên GitHub-hosted runner thường vẫn cào được nhưng nếu gặp
-  block, có thể cần:
-  - Tăng độ tinh vi User-Agent / thêm session cookies
-  - Dùng proxy (self-hosted runner ở VN)
-  - Hoặc thay bằng VietnamWorks / TopCV làm nguồn dự phòng.
+- **Vượt Cloudflare bằng Playwright**: ItViec dùng Cloudflare nên `requests`
+  thường bị 403 trên IP datacenter. Scraper mặc định dùng engine `playwright`
+  (Chromium headless thật, có patch ẩn cờ `navigator.webdriver`, viewport
+  desktop, locale `vi-VN`, timezone Asia/Ho_Chi_Minh). Tự đợi Cloudflare
+  challenge ~8s nếu phát hiện title "Just a moment...".
+- **Fallback**: Nếu Playwright fail liên tục -> tự rớt về engine `requests`.
+  Có thể ép engine: `python scripts/scrape_itviec.py --engine requests`.
+- **Cài đặt**: Trên GitHub Actions, workflow tự chạy
+  `playwright install --with-deps chromium` (cài chromium + lib hệ thống).
 - **Idempotent CSV**: tránh race condition khi 2 workflow chạy chồng lên nhau
   bằng `concurrency.group` trong workflow YAML.
 - **Quyền commit**: workflow cần `permissions.contents: write` để push ngược.
