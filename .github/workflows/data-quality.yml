@@ -1,0 +1,70 @@
+name: ItViec Data Quality
+
+on:
+  schedule:
+    - cron: '30 0 * * *'        # 07:30 VN - 30 phút sau scrape
+  workflow_dispatch:
+  push:
+    paths:
+      - 'data/itviec_jobs.csv'
+      - 'scripts/data_quality.py'
+      - 'scripts/config.py'
+      - '.github/workflows/data-quality.yml'
+
+concurrency:
+  group: itviec-quality
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+
+      - name: Install deps
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Check data exists
+        id: data
+        run: |
+          if [ -f data/itviec_jobs.csv ]; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "data/itviec_jobs.csv chưa tồn tại, bỏ qua quality check."
+          fi
+
+      - name: Run quality check
+        if: steps.data.outputs.exists == 'true'
+        id: quality
+        run: |
+          set +e
+          python scripts/data_quality.py --report quality_report.md
+          EXIT_CODE=$?
+          echo "exit_code=${EXIT_CODE}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload quality report
+        if: always() && steps.data.outputs.exists == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-report-${{ github.run_id }}
+          path: quality_report.md
+          retention-days: 30
+
+      - name: Fail if quality errors
+        if: steps.data.outputs.exists == 'true' && steps.quality.outputs.exit_code == '2'
+        run: |
+          echo "Data quality FAILED - exit 2"
+          exit 2
