@@ -95,13 +95,25 @@ def parse_job_card(card) -> Optional[Dict]:
     if not title:
         return None
 
-    # Công ty - thử nhiều selector vì ItViec hay đổi cấu trúc HTML
-    company_tag = (
-        card.find("a", class_=re.compile("company"))
-        or card.find("span", class_=re.compile("company"))
-        or card.find(class_=re.compile("employer"))
-    )
-    company = company_tag.get_text(strip=True) if company_tag else ""
+    # Công ty - ItViec hay đặt tên công ty bên trong link "/companies/SLUG"
+    # nên ta tìm tag <a> trỏ tới /companies/ trước, sau đó fallback các class.
+    company = ""
+    company_link = card.find("a", href=re.compile(r"/companies/"))
+    if company_link:
+        company = company_link.get_text(strip=True)
+    if not company:
+        company_tag = (
+            card.find("a", class_=re.compile("company"))
+            or card.find("span", class_=re.compile("company"))
+            or card.find(class_=re.compile("employer"))
+        )
+        if company_tag:
+            company = company_tag.get_text(strip=True)
+    if not company:
+        # Phương án cuối: lấy slug từ URL /companies/SLUG -> derive tên
+        if company_link and company_link.get("href"):
+            slug = company_link["href"].rstrip("/").split("/")[-1]
+            company = slug.replace("-", " ").title()
 
     # Địa điểm
     loc_tag = card.find(class_=re.compile(r"(address|location|city)"))
@@ -145,6 +157,108 @@ def parse_job_card(card) -> Optional[Dict]:
         "source":         "ItViec",
         "status":         "ok" if detail_url else "pending",
     }
+
+
+def parse_job_detail(html: str) -> Dict:
+    """
+    Parse trang CHI TIẾT job để bóc salary + mô tả + thông tin sâu hơn.
+
+    ItViec thường nhúng salary trong JSON-LD (script type=application/ld+json)
+    theo schema.org/JobPosting → đó là nguồn tin cậy nhất, kể cả khi UI ẩn
+    behind login wall.
+    """
+    soup = BeautifulSoup(html, "html.parser")
+    result = {"salary_min_usd": None, "salary_max_usd": None,
+              "salary_currency": "", "salary_source": "none"}
+
+    # 1) Ưu tiên đọc JSON-LD schema.org/JobPosting
+    import json as _json
+    for script in soup.find_all("script", type="application/ld+json"):
+        try:
+            data = _json.loads(script.string or "{}")
+        except (_json.JSONDecodeError, TypeError):
+            continue
+        # JSON-LD có thể là list hoặc dict
+        items = data if isinstance(data, list) else [data]
+        for item in items:
+            if item.get("@type") != "JobPosting":
+                continue
+            base = item.get("baseSalary") or {}
+            value = base.get("value") or {}
+            cur = base.get("currency", "")
+            if isinstance(value, dict):
+                lo, hi = value.get("minValue"), value.get("maxValue")
+                if lo or hi:
+                    result["salary_min_usd"] = lo
+                    result["salary_max_usd"] = hi
+                    result["salary_currency"] = cur
+                    result["salary_source"] = "json-ld"
+                    return result
+            elif value:
+                result["salary_min_usd"] = value
+                result["salary_max_usd"] = value
+                result["salary_currency"] = cur
+                result["salary_source"] = "json-ld"
+                return result
+
+    # 2) Fallback: tìm text salary trong DOM
+    salary_node = soup.find(class_=re.compile(r"salary", re.I))
+    if salary_node:
+        txt = salary_node.get_text(strip=True)
+        if "sign in" not in txt.lower() and txt:
+            lo, hi = parse_salary(txt)
+            if lo or hi:
+                result["salary_min_usd"] = lo
+                result["salary_max_usd"] = hi
+                result["salary_currency"] = "USD"
+                result["salary_source"] = "dom-text"
+    return result
+
+
+def enrich_with_details(jobs: List[Dict], fetcher, max_jobs: int = 100) -> List[Dict]:
+    """
+    Cào trang chi tiết để bổ sung salary thật cho từng job.
+
+    Args:
+        jobs:     list job dict từ scrape_itviec()
+        fetcher:  PlaywrightFetcher context (đã start) hoặc callable requests
+        max_jobs: giới hạn để không chạy quá lâu (mặc định 100 job)
+
+    Returns: list jobs đã được update salary_min_usd / salary_max_usd.
+    """
+    log.info("=== Enrich %d job đầu tiên với chi tiết salary ===",
+             min(len(jobs), max_jobs))
+
+    enriched = 0
+    for i, job in enumerate(jobs[:max_jobs]):
+        url = job.get("source_url", "")
+        if not url:
+            continue
+
+        # Hỗ trợ cả callable (requests) và PlaywrightFetcher
+        if callable(fetcher):
+            html = fetcher(url)
+        else:
+            html = fetcher.fetch(url)
+        if not html:
+            continue
+
+        detail = parse_job_detail(html)
+        if detail.get("salary_min_usd") or detail.get("salary_max_usd"):
+            job["salary_min_usd"] = detail["salary_min_usd"]
+            job["salary_max_usd"] = detail["salary_max_usd"]
+            job["salary"] = (
+                f"{detail['salary_min_usd']}-{detail['salary_max_usd']} "
+                f"{detail['salary_currency']}".strip()
+            )
+            enriched += 1
+
+        if (i + 1) % 10 == 0:
+            log.info("  Đã enrich %d/%d (thành công: %d)", i + 1, len(jobs), enriched)
+        time.sleep(REQUEST_DELAY)
+
+    log.info("Enrich xong: %d/%d job có salary thật", enriched, min(len(jobs), max_jobs))
+    return jobs
 
 
 def _parse_page(html: str) -> List[Dict]:
@@ -241,11 +355,25 @@ def main() -> int:
         "--engine", choices=["playwright", "requests"], default="playwright",
         help="Engine fetch HTML. 'playwright' vượt Cloudflare (mặc định).",
     )
+    parser.add_argument(
+        "--enrich-details", type=int, default=0, metavar="N",
+        help="Cào chi tiết N job đầu để lấy salary từ JSON-LD (chậm hơn ~3x).",
+    )
     args = parser.parse_args()
 
     target_date = date.fromisoformat(args.date) if args.date else today_vn()
 
     rows = scrape_itviec(target_date, max_pages=args.pages, engine=args.engine)
+
+    # Enrich salary bằng cách cào trang chi tiết (tùy chọn)
+    if rows and args.enrich_details > 0:
+        from fetcher import PlaywrightFetcher, fetch_with_requests
+        if args.engine == "playwright":
+            with PlaywrightFetcher() as f:
+                rows = enrich_with_details(rows, f, max_jobs=args.enrich_details)
+        else:
+            rows = enrich_with_details(rows, fetch_with_requests,
+                                       max_jobs=args.enrich_details)
 
     if not rows:
         log.error("KHÔNG thu được job nào - thoát với exit code 2")

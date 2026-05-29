@@ -11,6 +11,10 @@ on:
         description: 'Số trang tối đa cần cào'
         required: false
         default: '30'
+      enrich:
+        description: 'Số job đầu fetch detail để lấy salary (0 = bỏ qua)'
+        required: false
+        default: '200'
 
 # Đảm bảo không có 2 lần scrape chạy chồng lên nhau (tránh xung đột git push)
 concurrency:
@@ -43,10 +47,16 @@ jobs:
         # --with-deps tự cài các thư viện hệ thống cần thiết (libnss3, libatk...)
         run: python -m playwright install --with-deps chromium
 
-      - name: Run scraper (Playwright engine để vượt Cloudflare)
+      - name: Run scraper (Playwright + enrich detail để có salary thật)
         env:
           PAGES: ${{ github.event.inputs.pages || '30' }}
-        run: python scripts/scrape_itviec.py --pages "$PAGES" --engine playwright
+          # Enrich 200 job đầu để lấy salary từ JSON-LD (~6 phút trên runner)
+          ENRICH: ${{ github.event.inputs.enrich || '200' }}
+        run: |
+          python scripts/scrape_itviec.py \
+            --pages "$PAGES" \
+            --engine playwright \
+            --enrich-details "$ENRICH"
         # Không fail workflow nếu scrape thiếu - job quality sẽ alert
         continue-on-error: true
 
