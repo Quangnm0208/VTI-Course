@@ -5,7 +5,7 @@ name: Daily ItViec Scrape
 on:
   schedule:
     - cron: '0 0 * * *'        # 07:00 VN hàng ngày
-  workflow_dispatch:
+  workflow_dispatch:           # Cho phép trigger tay từ tab Actions
     inputs:
       pages:
         description: 'Số trang tối đa cần cào'
@@ -15,6 +15,13 @@ on:
         description: 'Số job đầu fetch detail để lấy salary (0 = bỏ qua)'
         required: false
         default: '200'
+  push:                        # Auto chạy khi scraper code thay đổi
+    paths:
+      - 'scripts/scrape_itviec.py'
+      - 'scripts/fetcher.py'
+      - 'scripts/config.py'
+      - 'scripts/csv_writer.py'
+      - '.github/workflows/daily-scrape.yml'
 
 # Đảm bảo không có 2 lần scrape chạy chồng lên nhau (tránh xung đột git push)
 concurrency:
