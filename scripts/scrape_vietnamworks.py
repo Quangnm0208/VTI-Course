@@ -9,7 +9,7 @@ của đề bài.
     body: {"userId":0,"query":"<keyword>","filter":[...],"ranges":[],
            "order":[],"hitsPerPage":50,"page":<n>,"retrieveFields":[...]}
 
-⚠️ GIỚI HẠN MÔI TRƯỜNG: trong sandbox của Claude/CI nội bộ, mọi host KHÁC GitHub
+⚠️ GIỚI HẠN MÔI TRƯỜNG: trong môi trường CI nội bộ, mọi host KHÁC GitHub
 đều bị chặn egress (403) nên script này KHÔNG chạy được ở đây. Nó chạy bình
 thường trên máy cá nhân hoặc runner có internet mở. KHÔNG bịa dữ liệu khi bị chặn.
 
