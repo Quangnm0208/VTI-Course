@@ -1,0 +1,76 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+  "name": "v_cmp",
+  "position": {
+    "x": 656,
+    "y": 124,
+    "z": 0,
+    "width": 608,
+    "height": 444,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "clusteredColumnChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vn_vs_global_compare"
+                    }
+                  },
+                  "Property": "vn_skill"
+                }
+              },
+              "queryRef": "vn_vs_global_compare.vn_skill"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "vn_vs_global_compare"
+                    }
+                  },
+                  "Property": "vn_pct_of_jd"
+                }
+              },
+              "queryRef": "vn_vs_global_compare.vn_pct_of_jd"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Top kỹ năng VN (% JD) — đối chiếu toàn cầu'"
+                }
+              }
+            },
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

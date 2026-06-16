@@ -11,11 +11,14 @@
 > `.pbip` không trỏ tới CSV ngoài nên mở là có dữ liệu liền.
 
 ## Trong file có gì
-- **Model** (`.SemanticModel`): 6 bảng dữ liệu nhúng + bảng `Measures` với 7 DAX
-  measure (Total Respondents, Median Salary, Top Desired Language, Emerging Count…).
-- **Report** (`.Report`): trang **Tổng quan** gồm **5 KPI cards + 3 biểu đồ + 2
-  slicer** (Tín hiệu, Nhóm ưu tiên) — đạt yêu cầu tối thiểu (≥5 visual, ≥2 slicer).
-- Muốn thêm trang Deep-dive/Recommendation: làm theo `dashboard_design.md`.
+- **Model** (`.SemanticModel`): 11 bảng dữ liệu nhúng (gồm 3 bảng Việt Nam) +
+  bảng `Measures` với 13 DAX measure (Total Respondents, Median Salary, VN Top Skill…).
+- **Report** (`.Report`): **4 trang, 25 visual** theo đúng thiết kế handoff:
+  - **01 Tổng quan** — 6 KPI cards + ngôn ngữ đang dùng/mong muốn + quốc gia + slicer Tín hiệu.
+  - **02 Cung–cầu kỹ năng** — database đang dùng vs muốn, skill-gap, lương, IDE, vai trò.
+  - **03 Việt Nam · ItViec** — 4 KPI + cầu kỹ năng VN + đối chiếu VN vs toàn cầu.
+  - **04 Khuyến nghị** — ưu tiên tuyển dụng, kỹ năng emerging, rubric phỏng vấn.
+- Mở `.pbip` là cả 4 trang hiện ra, dữ liệu có sẵn — chỉ việc bấm chuyển trang.
 
 ## Nếu Power BI Desktop của bạn báo lỗi định dạng report (PBIP preview)
 PBIP là định dạng văn bản, đôi khi khác nhau giữa các bản Desktop. Nếu phần

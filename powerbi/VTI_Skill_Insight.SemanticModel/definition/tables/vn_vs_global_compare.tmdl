@@ -1,0 +1,59 @@
+table vn_vs_global_compare
+	lineageTag: 9ab1ff91-e591-5697-b7df-9afd3fe999ec
+
+	column rank
+		dataType: int64
+		formatString: 0
+		lineageTag: 73df3db0-5b73-5aa2-b986-8a85980a1f47
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [rank]
+
+	column vn_skill
+		dataType: string
+		lineageTag: 382a7ecc-ffb6-543b-9a36-85e2d70506fa
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [vn_skill]
+
+	column vn_pct_of_jd
+		dataType: double
+		formatString: 0.0
+		lineageTag: 7df8e25e-0972-53f3-9eb0-43cf968ed4b8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [vn_pct_of_jd]
+
+	column global_language
+		dataType: string
+		lineageTag: 85481425-3ab4-5954-9460-61f4b0156926
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [global_language]
+
+	column global_worked
+		dataType: int64
+		formatString: 0
+		lineageTag: f1968439-5e39-5bbc-ba26-90ca7d9e3fa9
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [global_worked]
+
+	partition vn_vs_global_compare = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"rank", INTEGER,
+				"vn_skill", STRING,
+				"vn_pct_of_jd", DOUBLE,
+				"global_language", STRING,
+				"global_worked", INTEGER,
+				{
+					{1, "Python", 19.3, "JavaScript", 8805},
+					{2, "AI", 19.3, "HTML/CSS", 7920},
+					{3, "Java", 16.4, "SQL", 7213},
+					{4, "SQL", 14.9, "Python", 4611},
+					{5, "AWS", 11.5, "Java", 4556}
+				}
+			)
+		```

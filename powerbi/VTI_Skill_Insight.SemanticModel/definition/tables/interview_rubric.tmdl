@@ -1,0 +1,34 @@
+table interview_rubric
+	lineageTag: ed7962bc-4efb-53a3-874f-0a42f38cc593
+
+	column assessment_area
+		dataType: string
+		lineageTag: 7c06e3bb-8e69-5164-9d86-6ad03940779f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [assessment_area]
+
+	column weight_pct
+		dataType: int64
+		formatString: 0
+		lineageTag: a53319e6-c097-5178-bf22-c4f6e511ca7b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [weight_pct]
+
+	partition interview_rubric = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"assessment_area", STRING,
+				"weight_pct", INTEGER,
+				{
+					{"Core technical skill", 25},
+					{"Data and database thinking", 20},
+					{"Project evidence", 20},
+					{"Tooling and workflow", 15},
+					{"Problem solving", 10},
+					{"Communication", 10}
+				}
+			)
+		```

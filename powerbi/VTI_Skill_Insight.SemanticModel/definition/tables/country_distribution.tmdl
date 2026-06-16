@@ -1,0 +1,45 @@
+table country_distribution
+	lineageTag: ba5ae881-f623-584b-a980-f50f32a59acb
+
+	column country
+		dataType: string
+		lineageTag: edaf8b32-355e-5673-a1de-8ae2719bf5fd
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [country]
+
+	column count
+		dataType: int64
+		formatString: 0
+		lineageTag: c20e2e7c-86bf-5f44-ab72-8b98e3fb46b4
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [count]
+
+	column pct
+		dataType: double
+		formatString: 0.0
+		lineageTag: 5604e073-94ad-544a-9a3c-b28a368383d8
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [pct]
+
+	partition country_distribution = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"country", STRING,
+				"count", INTEGER,
+				"pct", DOUBLE,
+				{
+					{"United States", 3173, 27.5},
+					{"India", 911, 7.9},
+					{"United Kingdom", 841, 7.3},
+					{"Germany", 715, 6.2},
+					{"Canada", 442, 3.8},
+					{"France", 339, 2.9},
+					{"Brazil", 328, 2.8},
+					{"Australia", 287, 2.5}
+				}
+			)
+		```

@@ -27,6 +27,29 @@ table Measures
 		formatString: #,0
 		lineageTag: 32ea7a9b-26ff-5e91-bb1d-a455d9730ca0
 
+	measure 'Median Exp Years' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Median professional coding years"))
+		formatString: 0
+		lineageTag: c15a6247-c100-566a-888b-74c49b6ff4ca
+
+	measure 'Full-time Pct' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Employed full-time percentage"))
+		formatString: 0.0
+		lineageTag: 2edc5db1-eb16-594f-8eef-c546f943ae94
+
+	measure 'Avg Languages' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Average languages worked per respondent"))
+		formatString: 0.0
+		lineageTag: 0159bd96-e096-5ea9-b7df-682eff80bdb6
+
+	measure 'VN Total JD' = 1200
+		formatString: #,0
+		lineageTag: 28d5fd7d-39d4-5293-a415-ae45f3f44ed1
+
+	measure 'VN Top Skill' = CONCATENATEX(TOPN(1, ALL(vn_itviec_skill_demand), vn_itviec_skill_demand[jobs_count], DESC), vn_itviec_skill_demand[skill], ", ")
+		lineageTag: 7726f467-b445-5739-8e20-bbc403c946e0
+
+	measure 'VN Public Salary Pct' = 0
+		formatString: 0
+		lineageTag: 7d4c4582-b498-506b-a8c7-c7bdd3e26239
+
 	column _hidden
 		dataType: int64
 		isHidden

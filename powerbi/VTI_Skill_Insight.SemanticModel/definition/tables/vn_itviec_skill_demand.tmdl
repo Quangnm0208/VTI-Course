@@ -1,0 +1,66 @@
+table vn_itviec_skill_demand
+	lineageTag: af91034c-4ade-525c-b0fa-7a8937be4338
+
+	column skill
+		dataType: string
+		lineageTag: 9bc55f8b-2187-5eb7-9db3-0f0c3d7b637e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [skill]
+
+	column jobs_count
+		dataType: int64
+		formatString: 0
+		lineageTag: 6970b249-9e85-5510-834a-df7a3a31ac0b
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [jobs_count]
+
+	column pct_of_jobs
+		dataType: double
+		formatString: 0.0
+		lineageTag: 0ed7b4fc-013a-5442-8667-b4e103d6810a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [pct_of_jobs]
+
+	partition vn_itviec_skill_demand = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"skill", STRING,
+				"jobs_count", INTEGER,
+				"pct_of_jobs", DOUBLE,
+				{
+					{"English", 283, 23.6},
+					{"Python", 231, 19.3},
+					{"AI", 231, 19.3},
+					{"Java", 197, 16.4},
+					{"SQL", 179, 14.9},
+					{"AWS", 138, 11.5},
+					{"Agile", 136, 11.3},
+					{"Cloud", 112, 9.3},
+					{"JavaScript", 107, 8.9},
+					{"Database", 107, 8.9},
+					{"API", 100, 8.3},
+					{"Project Management", 95, 7.9},
+					{"Business Analysis", 89, 7.4},
+					{"ReactJS", 83, 6.9},
+					{"QA QC", 82, 6.8},
+					{"Tester", 80, 6.7},
+					{"Linux", 78, 6.5},
+					{"DevOps", 76, 6.3},
+					{"Scrum", 73, 6.1},
+					{"Microservices", 72, 6.0},
+					{"LLM", 70, 5.8},
+					{"Spring Boot", 67, 5.6},
+					{"CI/CD", 66, 5.5},
+					{"Machine Learning", 65, 5.4},
+					{"PostgreSql", 63, 5.3},
+					{"Team Management", 59, 4.9},
+					{"C++", 57, 4.8},
+					{"Golang", 57, 4.8},
+					{".NET", 56, 4.7}
+				}
+			)
+		```

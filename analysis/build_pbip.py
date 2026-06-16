@@ -120,6 +120,20 @@ def tmdl_measures() -> str:
         ("Emerging Language Count",
          'CALCULATE(COUNTROWS(language_signal), language_signal[signal] = "Emerging")', "0"),
         ("Total Desired (Languages)", "SUM(language_signal[desired_next_year])", "#,0"),
+        ("Median Exp Years",
+         'CALCULATE(MAXX(dataset_overview, dataset_overview[value]), '
+         'FILTER(dataset_overview, dataset_overview[metric] = "Median professional coding years"))', "0"),
+        ("Full-time Pct",
+         'CALCULATE(MAXX(dataset_overview, dataset_overview[value]), '
+         'FILTER(dataset_overview, dataset_overview[metric] = "Employed full-time percentage"))', "0.0"),
+        ("Avg Languages",
+         'CALCULATE(MAXX(dataset_overview, dataset_overview[value]), '
+         'FILTER(dataset_overview, dataset_overview[metric] = "Average languages worked per respondent"))', "0.0"),
+        ("VN Total JD", "1200", "#,0"),
+        ("VN Top Skill",
+         'CONCATENATEX(TOPN(1, ALL(vn_itviec_skill_demand), '
+         'vn_itviec_skill_demand[jobs_count], DESC), vn_itviec_skill_demand[skill], ", ")', ""),
+        ("VN Public Salary Pct", "0", "0"),
     ]
     lines = ["table Measures", f"\tlineageTag: {guid('t:Measures')}", ""]
     for name, expr, fmt in m:
@@ -189,7 +203,27 @@ def bar_visual(vid, x, y, w, h, entity, cat, val, title, is_measure=False):
             "query": {"queryState": {
                 "Category": {"projections": [col_field(entity, cat)]},
                 "Y": {"projections": [valproj]},
-            }, "sortDefinition": {"sort": [{"field": valproj["field"], "direction": "Descending"}]}},
+            }},
+            "visualContainerObjects": {
+                "title": [{"properties": {"text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
+                          "show": {"expr": {"Literal": {"Value": "true"}}}}}]},
+            "drillFilterOtherVisuals": True,
+        },
+    }
+
+
+def column_visual(vid, x, y, w, h, entity, cat, vals, title):
+    """Clustered column chart: 1 category + nhiều cột giá trị."""
+    return {
+        "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/1.4.0/schema.json",
+        "name": vid,
+        "position": {"x": x, "y": y, "z": 0, "width": w, "height": h, "tabOrder": 0},
+        "visual": {
+            "visualType": "clusteredColumnChart",
+            "query": {"queryState": {
+                "Category": {"projections": [col_field(entity, cat)]},
+                "Y": {"projections": [col_field(entity, v) for v in vals]},
+            }},
             "visualContainerObjects": {
                 "title": [{"properties": {"text": {"expr": {"Literal": {"Value": f"'{title}'"}}},
                           "show": {"expr": {"Literal": {"Value": "true"}}}}}]},
@@ -256,6 +290,9 @@ def build():
         "\tannotation __PBI_TimeIntelligenceEnabled = 0\n",
         encoding="utf-8")
 
+    import pandas as pd
+    vn_demand = pd.read_csv(PBI / "vn_itviec_skill_demand.csv")
+    vn_cmp = pd.read_csv(PBI / "vn_vs_global_compare.csv")
     tables = {
         "dataset_overview": M.dataset_overview()[["metric", "value"]],
         "language_signal": M.language_signal(),
@@ -263,6 +300,10 @@ def build():
         "ide_overall": M.ide_overall(),
         "salary_by_language": M.salary_by_language(),
         "role_priority": M.role_priority(),
+        "country_distribution": M.country_distribution(),
+        "interview_rubric": M.interview_rubric()[["assessment_area", "weight_pct"]],
+        "vn_itviec_skill_demand": vn_demand,
+        "vn_vs_global_compare": vn_cmp,
     }
     tdir = SM / "definition" / "tables"
     tdir.mkdir(parents=True, exist_ok=True)
@@ -288,39 +329,75 @@ def build():
         "layoutOptimization": "None",
     })
 
-    page_id = "overview"
+    # ---- 4 trang theo thiết kế handoff ----
+    pages = [
+        ("overview", "01 · Tổng quan", [
+            card_visual("o_k1", 16, 16, 200, 96, "Total Respondents", "Developers"),
+            card_visual("o_k2", 224, 16, 200, 96, "Total Countries", "Quốc gia"),
+            card_visual("o_k3", 432, 16, 200, 96, "Median Salary USD", "Median salary"),
+            card_visual("o_k4", 640, 16, 200, 96, "Median Exp Years", "Kinh nghiệm (năm)"),
+            card_visual("o_k5", 848, 16, 200, 96, "Full-time Pct", "Full-time %"),
+            card_visual("o_k6", 1056, 16, 208, 96, "Avg Languages", "Ngôn ngữ/dev"),
+            slicer_visual("o_slc", 16, 124, 1248, 64, "language_signal", "signal", "Bộ lọc tín hiệu"),
+            bar_visual("o_worked", 16, 200, 412, 360, "language_signal", "language",
+                       "worked", "Ngôn ngữ · đang dùng"),
+            bar_visual("o_desired", 436, 200, 412, 360, "language_signal", "language",
+                       "desired_next_year", "Ngôn ngữ · mong muốn năm tới"),
+            bar_visual("o_country", 856, 200, 408, 360, "country_distribution", "country",
+                       "pct", "Phân bố nhà phát triển theo quốc gia (%)"),
+        ]),
+        ("demand", "02 · Cung–cầu kỹ năng", [
+            column_visual("d_db", 16, 16, 624, 330, "database_signal", "database",
+                          ["worked", "desired_next_year"], "Database: đang dùng vs muốn dùng"),
+            bar_visual("d_gap", 656, 16, 608, 330, "database_signal", "database",
+                       "net_change", "Skill-gap database (net change)"),
+            bar_visual("d_sal", 16, 360, 412, 344, "salary_by_language", "language",
+                       "median_salary", "Lương trung vị theo ngôn ngữ (USD)"),
+            bar_visual("d_ide", 436, 360, 412, 344, "ide_overall", "ide",
+                       "usage_pct", "IDE phổ biến nhất (%)"),
+            bar_visual("d_iderole", 856, 360, 408, 344, "role_priority", "role",
+                       "developer_count", "Quy mô theo vai trò (số dev)"),
+        ]),
+        ("vietnam", "03 · Việt Nam · ItViec", [
+            card_visual("v_k1", 16, 16, 300, 96, "VN Total JD", "Tin tuyển dụng (ItViec)"),
+            card_visual("v_k2", 324, 16, 300, 96, "VN Top Skill", "Kỹ năng kỹ thuật #1"),
+            card_visual("v_k3", 632, 16, 300, 96, "VN Public Salary Pct", "% JD công khai lương"),
+            card_visual("v_k4", 940, 16, 324, 96, "Median Salary USD", "Mốc lương toàn cầu"),
+            bar_visual("v_demand", 16, 124, 624, 444, "vn_itviec_skill_demand", "skill",
+                       "pct_of_jobs", "Cầu kỹ năng tại Việt Nam (% trên 1.200 JD)"),
+            column_visual("v_cmp", 656, 124, 608, 444, "vn_vs_global_compare", "vn_skill",
+                          ["vn_pct_of_jd"], "Top kỹ năng VN (% JD) — đối chiếu toàn cầu"),
+        ]),
+        ("strategy", "04 · Khuyến nghị", [
+            bar_visual("s_role", 16, 16, 624, 344, "role_priority", "role",
+                       "hiring_priority_score", "Ưu tiên tuyển dụng theo vai trò (điểm)"),
+            bar_visual("s_emerging", 656, 16, 608, 344, "language_signal", "language",
+                       "growth_pct", "Tăng trưởng nhu cầu ngôn ngữ (%)"),
+            bar_visual("s_rubric", 16, 376, 624, 328, "interview_rubric", "assessment_area",
+                       "weight_pct", "Khung chấm phỏng vấn (trọng số %)"),
+            bar_visual("s_emerging_db", 656, 376, 608, 328, "database_signal", "database",
+                       "growth_pct", "Tăng trưởng nhu cầu database (%)"),
+        ]),
+    ]
+
+    page_ids = [p[0] for p in pages]
     write(rdef / "pages" / "pages.json", {
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.0.0/schema.json",
-        "pageOrder": [page_id], "activePageName": page_id,
+        "pageOrder": page_ids, "activePageName": page_ids[0],
     })
-    write(rdef / "pages" / page_id / "page.json", {
-        "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
-        "name": page_id, "displayName": "Tổng quan kỹ năng IT",
-        "displayOption": "FitToPage", "height": 720, "width": 1280,
-    })
-
-    visuals = [
-        card_visual("v_kpi1", 16, 16, 230, 110, "Total Respondents", "Developers"),
-        card_visual("v_kpi2", 262, 16, 230, 110, "Total Countries", "Quốc gia"),
-        card_visual("v_kpi3", 508, 16, 230, 110, "Median Salary USD", "Median salary"),
-        card_visual("v_kpi4", 754, 16, 250, 110, "Emerging Language Count", "Ngôn ngữ Emerging"),
-        card_visual("v_kpi5", 1020, 16, 244, 110, "Total Desired (Languages)", "Tổng nhu cầu ngôn ngữ"),
-        bar_visual("v_lang", 16, 142, 612, 290, "language_signal", "language",
-                   "desired_next_year", "Top ngôn ngữ muốn dùng năm tới"),
-        bar_visual("v_db", 652, 142, 612, 290, "database_signal", "database",
-                   "desired_next_year", "Top cơ sở dữ liệu muốn dùng"),
-        bar_visual("v_sal", 16, 448, 612, 256, "salary_by_language", "language",
-                   "median_salary", "Lương trung vị theo ngôn ngữ (USD)"),
-        slicer_visual("v_sl_sig", 652, 448, 300, 256, "language_signal", "signal",
-                      "Bộ lọc: Tín hiệu"),
-        slicer_visual("v_sl_role", 964, 448, 300, 256, "role_priority", "priority_band",
-                      "Bộ lọc: Nhóm ưu tiên"),
-    ]
-    for v in visuals:
-        write(rdef / "pages" / page_id / "visuals" / v["name"] / "visual.json", v)
+    total_visuals = 0
+    for pid, disp, visuals in pages:
+        write(rdef / "pages" / pid / "page.json", {
+            "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+            "name": pid, "displayName": disp,
+            "displayOption": "FitToPage", "height": 720, "width": 1280,
+        })
+        for v in visuals:
+            write(rdef / "pages" / pid / "visuals" / v["name"] / "visual.json", v)
+            total_visuals += 1
 
     print(f"[ok] PBIP -> {(PBI / (NAME + '.pbip')).relative_to(ROOT)}")
-    print(f"     model tables: {len(tables)+1} (data nhúng sẵn) · visuals: {len(visuals)}")
+    print(f"     tables: {len(tables)+1} (data nhúng) · pages: {len(pages)} · visuals: {total_visuals}")
 
 
 if __name__ == "__main__":
