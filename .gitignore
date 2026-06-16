@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data: bỏ qua dữ liệu RAW bản quyền (Final Project.csv), GIỮ dữ liệu API công khai.
+# data/clean/ và data/processed/ chứa SẢN PHẨM NỘP nên được commit.
+# Giữ dữ liệu API GitHub công khai (nguồn 3); chặn phần raw bản quyền còn lại.
+data/raw/*
+!data/raw/github_tech_demand.csv
+!data/raw/github_repos_sample.csv
+*.tmp_*.csv
+quality_report.md
+
+# Misc
+*.log

@@ -1,0 +1,13 @@
+﻿database,worked,desired_next_year,net_change,growth_pct,desired_market_pct,signal
+PostgreSQL,4153,4386,233,5.6,38.0,Stable
+MongoDB,3058,3703,645,21.1,32.1,Emerging
+Redis,2536,3385,849,33.5,29.3,Emerging
+MySQL,5549,3328,-2221,-40.0,28.8,Declining
+Elasticsearch,1980,2898,918,46.4,25.1,Emerging
+Microsoft SQL Server,4170,2747,-1423,-34.1,23.8,Declining
+SQLite,3292,2465,-827,-25.1,21.3,Declining
+Firebase,1343,1679,336,25.0,14.5,Emerging
+MariaDB,1724,1400,-324,-18.8,12.1,Stable
+DynamoDB,839,1056,217,25.9,9.1,Emerging
+Cassandra,403,1023,620,153.8,8.9,Emerging
+Oracle,1761,881,-880,-50.0,7.6,Declining

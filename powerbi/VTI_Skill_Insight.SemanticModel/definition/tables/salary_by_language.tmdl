@@ -1,0 +1,72 @@
+table salary_by_language
+	lineageTag: a206f15a-6c2e-5a4f-b995-0745c4e4d8e9
+
+	column language
+		dataType: string
+		lineageTag: 8fbea2d5-e1f0-5a44-8210-62d7773d35d2
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [language]
+
+	column developer_count
+		dataType: int64
+		formatString: 0
+		lineageTag: de85b353-87ae-5534-a98b-c4742490987a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [developer_count]
+
+	column median_salary
+		dataType: int64
+		formatString: 0
+		lineageTag: 2cac4d49-a4c2-5957-8779-ab11bcc40e15
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [median_salary]
+
+	column mean_salary
+		dataType: int64
+		formatString: 0
+		lineageTag: 3b3ffb05-c65c-5116-8189-f31221bfc4bb
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [mean_salary]
+
+	column mean_vs_global_pct
+		dataType: double
+		formatString: 0.0
+		lineageTag: d0446794-9ce4-5751-8957-f1884a58f8bf
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [mean_vs_global_pct]
+
+	partition salary_by_language = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"language", STRING,
+				"developer_count", INTEGER,
+				"median_salary", INTEGER,
+				"mean_salary", INTEGER,
+				"mean_vs_global_pct", DOUBLE,
+				{
+					{"Clojure", 152, 93404, 114203, 44.1},
+					{"Go", 1060, 80000, 98923, 24.8},
+					{"Scala", 461, 79163, 98884, 24.7},
+					{"Ruby", 1094, 75000, 94376, 19.0},
+					{"Elixir", 169, 71966, 89015, 12.3},
+					{"Rust", 311, 70000, 88382, 11.5},
+					{"Bash/Shell/PowerShell", 4417, 68745, 89946, 13.5},
+					{"Objective-C", 483, 64115, 87429, 10.3},
+					{"Python", 4293, 64000, 85750, 8.2},
+					{"R", 552, 63016, 85477, 7.8},
+					{"Swift", 668, 60674, 81501, 2.8},
+					{"TypeScript", 3012, 60173, 80456, 3.5},
+					{"C#", 3993, 59112, 79957, 1.6},
+					{"JavaScript", 8136, 58000, 79063, 0.0},
+					{"SQL", 6687, 58284, 78852, -0.7},
+					{"Java", 4168, 53437, 75838, -7.6},
+					{"PHP", 2720, 43296, 66879, -25.2}
+				}
+			)
+		```

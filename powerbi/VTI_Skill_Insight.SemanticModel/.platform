@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "SemanticModel",
+    "displayName": "VTI_Skill_Insight"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "6cf8d447-42a8-5736-ab28-595620ffa742"
+  }
+}

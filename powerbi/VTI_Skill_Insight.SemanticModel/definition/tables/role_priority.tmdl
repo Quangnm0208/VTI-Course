@@ -1,0 +1,62 @@
+table role_priority
+	lineageTag: 2fd7a54d-f5ab-5af1-ae01-5dfc472a1dcc
+
+	column role
+		dataType: string
+		lineageTag: f2a31009-2980-5dcf-a0ba-679af4cc2036
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [role]
+
+	column developer_count
+		dataType: int64
+		formatString: 0
+		lineageTag: b16548e2-4d11-5e88-95fd-1dacff6a8539
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [developer_count]
+
+	column median_salary
+		dataType: int64
+		formatString: 0
+		lineageTag: 13500887-f8be-50bb-8d1b-b7d6b1f7c1d7
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [median_salary]
+
+	column hiring_priority_score
+		dataType: double
+		formatString: 0.0
+		lineageTag: a1055c79-d5e8-5335-98e9-87a0f7a19db1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [hiring_priority_score]
+
+	column priority_band
+		dataType: string
+		lineageTag: e756efed-3885-5a4e-b926-b02a87b895de
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [priority_band]
+
+	partition role_priority = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"role", STRING,
+				"developer_count", INTEGER,
+				"median_salary", INTEGER,
+				"hiring_priority_score", DOUBLE,
+				"priority_band", STRING,
+				{
+					{"Full-stack Developer", 6928, 59000, 72.9, "Priority 1"},
+					{"Back-end Developer", 6290, 56715, 65.9, "Priority 2"},
+					{"DevOps Specialist", 1639, 71036, 46.1, "Priority 2"},
+					{"Front-end Developer", 3920, 53437, 45.2, "Priority 2"},
+					{"Product/BA", 1179, 61650, 33.3, "Priority 3"},
+					{"Data/BI Analyst", 802, 61872, 30.8, "Priority 3"},
+					{"Data Scientist / ML", 803, 60000, 28.9, "Priority 3"},
+					{"Mobile Developer", 1959, 46152, 23.5, "Priority 3"}
+				}
+			)
+		```

@@ -1,0 +1,36 @@
+table dataset_overview
+	lineageTag: c51b676f-e8d8-584f-9391-233187243f45
+
+	column metric
+		dataType: string
+		lineageTag: 2b40fbb6-7808-575e-b5fb-a14b7fcbc3f9
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [metric]
+
+	column value
+		dataType: double
+		formatString: 0.0
+		lineageTag: 5d228828-3364-5744-803d-b1fa3f10ff0a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [value]
+
+	partition dataset_overview = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"metric", STRING,
+				"value", DOUBLE,
+				{
+					{"Total respondents", 11552.0},
+					{"Countries covered", 135.0},
+					{"Viet Nam responses", 12.0},
+					{"Median salary USD", 57844.0},
+					{"Median professional coding years", 5.0},
+					{"Employed full-time percentage", 96.2},
+					{"Avg languages worked per respondent", 5.2},
+					{"Avg languages desired per respondent", 4.9}
+				}
+			)
+		```
