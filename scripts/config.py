@@ -5,6 +5,7 @@ Quy ước CSV và idempotency key dùng chung cho toàn bộ scripts.
 """
 
 from __future__ import annotations
+import os
 from pathlib import Path
 
 # -----------------------------------------------------------------------------
@@ -19,6 +20,8 @@ CSV_PATH     = DATA_DIR / "itviec_jobs.csv"
 # -----------------------------------------------------------------------------
 ITVIEC_BASE = "https://itviec.com"
 ITVIEC_JOBS = "https://itviec.com/it-jobs"
+# Mẫu URL trang chi tiết job (canonical). ItViec dùng dạng /it/<slug>.
+ITVIEC_JOB_DETAIL = "https://itviec.com/it/{slug}"
 
 HTTP_HEADERS = {
     "User-Agent": (
@@ -26,8 +29,35 @@ HTTP_HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/120.0.0.0 Safari/537.36"
     ),
+    # Header gần với trình duyệt thật để giảm khả năng bị Cloudflare chặn (403).
+    "Accept": ("text/html,application/xhtml+xml,application/xml;q=0.9,"
+               "image/avif,image/webp,*/*;q=0.8"),
     "Accept-Language": "vi,en;q=0.9",
+    "Sec-Fetch-Dest": "document",
+    "Sec-Fetch-Mode": "navigate",
+    "Sec-Fetch-Site": "none",
+    "Upgrade-Insecure-Requests": "1",
 }
+
+# -----------------------------------------------------------------------------
+# Xác thực (để MỞ KHÓA mức lương bị ẩn sau "Sign in to view salary")
+# -----------------------------------------------------------------------------
+# ItViec ẩn lương với khách vãng lai. Cách hợp lệ để lấy lương thật là dùng
+# CHÍNH phiên đăng nhập của bạn:
+#   - ITVIEC_COOKIE : chuỗi cookie copy từ trình duyệt đã đăng nhập
+#                     (DevTools -> Application -> Cookies -> copy header 'Cookie').
+#   - Hoặc ITVIEC_EMAIL + ITVIEC_PASSWORD : Playwright tự đăng nhập.
+# Không có thông tin này, scraper vẫn chạy nhưng đánh dấu salary_status=
+# 'login_required' thay vì bịa số.
+ITVIEC_COOKIE = os.environ.get("ITVIEC_COOKIE", "").strip()
+ITVIEC_EMAIL = os.environ.get("ITVIEC_EMAIL", "").strip()
+ITVIEC_PASSWORD = os.environ.get("ITVIEC_PASSWORD", "").strip()
+
+# Tỷ giá quy đổi VND -> USD (lương ItViec thường niêm yết bằng VND/tháng).
+# Cho phép override qua env để cập nhật khi tỷ giá đổi.
+VND_PER_USD = float(os.environ.get("VND_PER_USD", "25000"))
+# Lương ItViec là theo THÁNG; nhân 12 để so với lương/năm của khảo sát SO (tùy chọn).
+SALARY_MONTHS_PER_YEAR = 12
 
 # Số trang tối đa cào mỗi lần (mỗi page ~ 20 jobs).
 # Trên GitHub Actions, mặc định 30 -> ~600 jobs/ngày, an toàn timeout 10 phút.
@@ -44,13 +74,15 @@ REQUEST_TIMEOUT = 30
 # -----------------------------------------------------------------------------
 CSV_COLUMNS = [
     "scrape_date",      # YYYY-MM-DD (giờ VN) - khóa idempotent thứ 1
-    "source_url",       # URL chi tiết job - khóa idempotent thứ 2
+    "source_url",       # URL chi tiết job (canonical) - khóa idempotent thứ 2
     "job_title",
     "company",
     "location",
-    "salary",           # raw text (có thể là "Negotiable")
+    "salary",           # raw text (có thể là "Negotiable" / "Sign in to view salary")
     "salary_min_usd",
     "salary_max_usd",
+    "salary_currency",  # 'USD' | 'VND' | '' - đơn vị gốc trước khi quy đổi
+    "salary_status",    # 'visible' | 'login_required' | 'negotiable' | 'none'
     "skills",           # nối bằng ';'
     "source",           # nguồn dữ liệu, vd 'ItViec'
     "status",           # 'ok' | 'pending'

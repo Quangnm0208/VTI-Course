@@ -1,0 +1,13 @@
+﻿skill_name,count,growth_pct,signal,category
+PostgreSQL,4153,5.6,Stable,database
+MongoDB,3058,21.1,Emerging,database
+Redis,2536,33.5,Emerging,database
+MySQL,5549,-40.0,Declining,database
+Elasticsearch,1980,46.4,Emerging,database
+Microsoft SQL Server,4170,-34.1,Declining,database
+SQLite,3292,-25.1,Declining,database
+Firebase,1343,25.0,Emerging,database
+MariaDB,1724,-18.8,Stable,database
+DynamoDB,839,25.9,Emerging,database
+Cassandra,403,153.8,Emerging,database
+Oracle,1761,-50.0,Declining,database

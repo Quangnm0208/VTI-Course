@@ -1,6 +1,25 @@
 # VTI Course - Final Project: A Day in the Life of a Data Analyst
 **Phân tích Kỹ năng CNTT với hệ thống scraping tự động hàng ngày**
 
+## 📦 Sản phẩm nộp (Final Project deliverables)
+
+| # | Yêu cầu đề bài | File trong repo |
+|---|----------------|-----------------|
+| A | Clean data + bảng summary | `data/processed/*.csv`, `data/clean/*.csv`, `data/processed/skill_market_insight.xlsx` |
+| B | Python (collect + clean + analyze) | `src/utils.py`, `src/03_analyze_data.py`, `scripts/` (scraper), `analysis/`, `notebooks/01_analysis.ipynb` |
+| C | SQL (CREATE/INSERT/SELECT) | `sql/analysis_queries.sql` (long-format `skill_usage` + số liệu thật), `sql/queries.sql` |
+| D | Power BI dashboard | `powerbi/dashboard_design.md` (3 trang + DAX), `powerbi/*.csv` (nguồn), **`powerbi/dashboard.html`** (demo tương tác chạy được ngay) |
+| E | Narrative 1 trang A4 | `reports/narrative_summary_1_page.md` |
+| F | Slide ≤10 + script bảo vệ | `docs/presentation.pptx` (10 slide, chart native), `reports/slide_deck_outline.md`, `reports/defense_script.md` |
+| — | Kế hoạch dự án + QA | `README_PROJECT.md` |
+
+> **Câu hỏi phân tích** (Ngôn ngữ · Database · IDE · Kỹ năng nổi) được trả lời
+> bằng số liệu thật trong dashboard, SQL, slide và notebook — tất cả lấy từ một
+> nguồn duy nhất `analysis/market_insight_data.py` nên luôn khớp nhau.
+>
+> ⚠️ **Còn thiếu 1 input:** `Final Project.csv` (khảo sát Stack Overflow gốc)
+> không commit (xem `data/README.md`). Mọi số liệu tổng hợp đã được tính từ nó.
+
 ## Tổng quan
 
 Repository này gồm 2 thành phần:

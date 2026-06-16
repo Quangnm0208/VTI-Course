@@ -31,9 +31,11 @@ from bs4 import BeautifulSoup
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from config import (
-    CSV_PATH, HTTP_HEADERS, ITVIEC_BASE, ITVIEC_JOBS,
+    CSV_PATH, HTTP_HEADERS, ITVIEC_BASE, ITVIEC_JOBS, ITVIEC_JOB_DETAIL,
     MAX_PAGES_DEFAULT, QUALITY_THRESHOLDS, REQUEST_DELAY, REQUEST_TIMEOUT,
+    VND_PER_USD,
 )
+from urllib.parse import urlparse, parse_qs
 from csv_writer import upsert_rows
 from fetcher import PlaywrightFetcher, fetch_with_requests
 
@@ -55,23 +57,115 @@ def today_vn() -> date:
 
 def parse_salary(raw: str) -> tuple[Optional[float], Optional[float]]:
     """
-    Tách salary text -> (min_usd, max_usd).
-    Vd: "1,500 - 2,500 USD" -> (1500.0, 2500.0)
-         "Negotiable"        -> (None, None)
+    Tách salary text -> (min, max) ở ĐƠN VỊ GỐC (chưa quy đổi tiền tệ).
+
+    Hỗ trợ nhiều dạng ItViec hay dùng:
+        "1,500 - 2,500 USD"     -> (1500.0, 2500.0)
+        "1500 USD"              -> (1500.0, 1500.0)
+        "$1,500 - $2,500"       -> (1500.0, 2500.0)
+        "Up to 2,500 USD"       -> (None, 2500.0)
+        "From 1,000 USD"        -> (1000.0, None)
+        "20,000,000 - 30,000,000 VND" -> (20000000.0, 30000000.0)
+        "Negotiable"/"Thoả thuận"/"" -> (None, None)
     """
     if not raw:
         return (None, None)
-    clean = raw.replace(",", "")
-    # Regex tìm 2 số nối bằng "-"
-    m = re.search(r"(\d+(?:\.\d+)?)\s*-\s*(\d+(?:\.\d+)?)", clean)
+    clean = raw.replace(",", "").replace("$", " ")
+    low = clean.lower()
+    if any(k in low for k in ("negotiable", "thoả thuận", "thoa thuan", "sign in")):
+        return (None, None)
+
+    # Khoảng "a - b"
+    m = re.search(r"(\d+(?:\.\d+)?)\s*[-–]\s*(\d+(?:\.\d+)?)", clean)
     if m:
         return (float(m.group(1)), float(m.group(2)))
-    # Chỉ có 1 con số -> coi là both min & max
+    # "Up to X" / "Lên đến X" -> chỉ có max
+    if re.search(r"up to|lên đến|len den|tối đa|toi da", low):
+        m = re.search(r"(\d+(?:\.\d+)?)", clean)
+        if m:
+            return (None, float(m.group(1)))
+    # "From X" / "Từ X" / "X+" -> chỉ có min
+    if re.search(r"\bfrom\b|\btừ\b|\btu\b|\d\+", low):
+        m = re.search(r"(\d+(?:\.\d+)?)", clean)
+        if m:
+            return (float(m.group(1)), None)
+    # Một con số duy nhất -> coi là cả min lẫn max
     m = re.search(r"(\d+(?:\.\d+)?)", clean)
     if m:
         v = float(m.group(1))
         return (v, v)
     return (None, None)
+
+
+def detect_currency(raw: str) -> str:
+    """Đoán đơn vị tiền từ text salary. Trả về 'USD' | 'VND' | ''."""
+    if not raw:
+        return ""
+    low = raw.lower()
+    if "usd" in low or "$" in raw:
+        return "USD"
+    if "vnd" in low or "vnđ" in low or "triệu" in low or "tr" in low.split():
+        return "VND"
+    # Số rất lớn (>= 1 triệu) gần như chắc chắn là VND/tháng
+    digits = re.sub(r"[^\d]", "", raw)
+    if digits and int(digits[:9] or 0) >= 1_000_000:
+        return "VND"
+    return ""
+
+
+def to_usd(value: Optional[float], currency: str) -> Optional[float]:
+    """Quy đổi 1 giá trị lương về USD. VND -> chia tỷ giá; USD giữ nguyên."""
+    if value is None:
+        return None
+    if currency == "VND":
+        return round(value / VND_PER_USD, 0)
+    return value
+
+
+def salary_status_from_text(raw: str) -> str:
+    """Phân loại trạng thái lương từ text hiển thị trên card/detail."""
+    if not raw:
+        return "none"
+    low = raw.lower()
+    if "sign in" in low or "đăng nhập" in low or "dang nhap" in low:
+        return "login_required"
+    if any(k in low for k in ("negotiable", "thoả thuận", "thoa thuan", "competitive")):
+        return "negotiable"
+    if re.search(r"\d", low):
+        return "visible"
+    return "none"
+
+
+def canonical_job_url(href: str) -> str:
+    """
+    Chuẩn hóa URL job về dạng canonical, KỂ CẢ khi card chỉ có link
+    'sign_in?job=<slug>&...'. ItViec nhúng slug job thật trong tham số ?job=,
+    nên ta tái tạo lại URL chi tiết /it/<slug> thay vì lưu nhầm link đăng nhập.
+    """
+    if not href:
+        return ""
+    full = href if href.startswith("http") else ITVIEC_BASE + href
+    parsed = urlparse(full)
+    if "/sign_in" in parsed.path or "sign_in" in parsed.path:
+        qs = parse_qs(parsed.query)
+        slug = (qs.get("job") or [""])[0]
+        if slug:
+            return ITVIEC_JOB_DETAIL.format(slug=slug)
+    return full
+
+
+def company_from_slug(slug: str) -> str:
+    """
+    Suy ra tên công ty từ slug job (ItViec gắn tên công ty ở đuôi slug).
+    Vd: 'district-7-...-posco-dx-vietnam-2925' -> bỏ id số -> 'Posco Dx Vietnam'
+    (chỉ là phương án cuối khi không tìm được tên công ty trong HTML).
+    """
+    if not slug:
+        return ""
+    parts = [p for p in slug.split("-") if p and not p.isdigit()]
+    # Lấy 3 từ cuối làm ước lượng tên công ty (heuristic nhẹ).
+    tail = parts[-3:] if len(parts) >= 3 else parts
+    return " ".join(w.capitalize() for w in tail)
 
 
 # -----------------------------------------------------------------------------
@@ -115,47 +209,67 @@ def parse_job_card(card) -> Optional[Dict]:
             slug = company_link["href"].rstrip("/").split("/")[-1]
             company = slug.replace("-", " ").title()
 
-    # Địa điểm
-    loc_tag = card.find(class_=re.compile(r"(address|location|city)"))
-    location = loc_tag.get_text(strip=True) if loc_tag else ""
+    # Địa điểm — ItViec để trong node address/location/city, đôi khi là
+    # data-attribute. Nhiều giá trị (HCM/HN) ngăn cách bởi dấu phẩy.
+    loc_tag = card.find(class_=re.compile(r"(address|location|city|locations)"))
+    location = loc_tag.get_text(" ", strip=True) if loc_tag else ""
+    if not location:
+        svg_loc = card.find(attrs={"data-url": re.compile(r"location", re.I)})
+        if svg_loc and svg_loc.parent:
+            location = svg_loc.parent.get_text(" ", strip=True)
 
-    # Lương (ItViec hay để "Sign in to view")
+    # Lương: ItViec ẩn lương sau "Sign in to view salary" với khách vãng lai.
+    # Ta KHÔNG bịa số — chỉ phân loại trạng thái và parse khi có số thật.
     salary_tag = card.find(class_=re.compile("salary"))
     salary_raw = salary_tag.get_text(strip=True) if salary_tag else "Negotiable"
-    salary_min, salary_max = parse_salary(salary_raw)
+    sal_status = salary_status_from_text(salary_raw)
+    currency = detect_currency(salary_raw)
+    lo, hi = parse_salary(salary_raw)
+    salary_min = to_usd(lo, currency)
+    salary_max = to_usd(hi, currency)
 
     # Tags kỹ năng
     tag_nodes = card.find_all(class_=re.compile(r"(itag|tag|skill)"))
     tags = [t.get_text(strip=True) for t in tag_nodes if t.get_text(strip=True)]
     skills = ";".join(sorted({t for t in tags if t})) if tags else ""
 
-    # Link chi tiết job (làm khóa upsert). Ưu tiên link KHÔNG trỏ tới trang
-    # company - ItViec đặt link công ty ngay đầu card nên phải lọc.
+    # Link chi tiết job (khóa upsert). ItViec đặt link company ở đầu card và
+    # link "xem lương" trỏ tới /sign_in. Ta:
+    #   1) bỏ qua link company/employer,
+    #   2) ưu tiên link job thật (/it/ hoặc /it-jobs/),
+    #   3) nếu chỉ còn link /sign_in?job=<slug> -> tái tạo URL canonical từ slug.
     detail_url = ""
+    signin_url = ""
     for a in card.find_all("a", href=True):
         href = a["href"]
         if "/companies/" in href or "/employers/" in href:
-            continue            # bỏ qua link company
-        detail_url = href if href.startswith("http") else ITVIEC_BASE + href
+            continue
+        if "/sign_in" in href or "sign_in" in href:
+            signin_url = signin_url or href      # giữ lại để reconstruct
+            continue
+        detail_url = canonical_job_url(href)
         break
-    if not detail_url:
-        # Fallback: lấy link đầu tiên nếu không có link nào khác
-        first = card.find("a", href=True)
-        if first:
-            href = first["href"]
-            detail_url = href if href.startswith("http") else ITVIEC_BASE + href
+    if not detail_url and signin_url:
+        detail_url = canonical_job_url(signin_url)   # /sign_in?job=slug -> /it/slug
+
+    # Nếu vẫn chưa có company: derive từ slug job (đuôi slug là tên công ty).
+    if not company and detail_url:
+        slug = detail_url.rstrip("/").split("/")[-1]
+        company = company_from_slug(slug)
 
     return {
-        "job_title":      title,
-        "company":        company,
-        "location":       location,
-        "salary":         salary_raw,
-        "salary_min_usd": salary_min,
-        "salary_max_usd": salary_max,
-        "skills":         skills,
-        "source_url":     detail_url,
-        "source":         "ItViec",
-        "status":         "ok" if detail_url else "pending",
+        "job_title":       title,
+        "company":         company,
+        "location":        location,
+        "salary":          salary_raw,
+        "salary_min_usd":  salary_min,
+        "salary_max_usd":  salary_max,
+        "salary_currency": currency,
+        "salary_status":   sal_status,
+        "skills":          skills,
+        "source_url":      detail_url,
+        "source":          "ItViec",
+        "status":          "ok" if detail_url else "pending",
     }
 
 
@@ -169,19 +283,21 @@ def parse_job_detail(html: str) -> Dict:
     """
     soup = BeautifulSoup(html, "html.parser")
     result = {"salary_min_usd": None, "salary_max_usd": None,
-              "salary_currency": "", "salary_source": "none"}
+              "salary_currency": "", "salary_source": "none",
+              "salary_status": "none"}
 
-    # 1) Ưu tiên đọc JSON-LD schema.org/JobPosting
+    # 1) Ưu tiên đọc JSON-LD schema.org/JobPosting (nguồn tin cậy nhất, kể cả
+    #    khi UI ẩn lương). LƯU Ý: giá trị min/max được giữ NGUYÊN đơn vị gốc
+    #    (test kiểm tra số gốc). Đơn vị được ghi ở salary_currency.
     import json as _json
     for script in soup.find_all("script", type="application/ld+json"):
         try:
             data = _json.loads(script.string or "{}")
         except (_json.JSONDecodeError, TypeError):
             continue
-        # JSON-LD có thể là list hoặc dict
         items = data if isinstance(data, list) else [data]
         for item in items:
-            if item.get("@type") != "JobPosting":
+            if not isinstance(item, dict) or item.get("@type") != "JobPosting":
                 continue
             base = item.get("baseSalary") or {}
             value = base.get("value") or {}
@@ -189,29 +305,27 @@ def parse_job_detail(html: str) -> Dict:
             if isinstance(value, dict):
                 lo, hi = value.get("minValue"), value.get("maxValue")
                 if lo or hi:
-                    result["salary_min_usd"] = lo
-                    result["salary_max_usd"] = hi
-                    result["salary_currency"] = cur
-                    result["salary_source"] = "json-ld"
+                    result.update(salary_min_usd=lo, salary_max_usd=hi,
+                                  salary_currency=cur, salary_source="json-ld",
+                                  salary_status="visible")
                     return result
             elif value:
-                result["salary_min_usd"] = value
-                result["salary_max_usd"] = value
-                result["salary_currency"] = cur
-                result["salary_source"] = "json-ld"
+                result.update(salary_min_usd=value, salary_max_usd=value,
+                              salary_currency=cur, salary_source="json-ld",
+                              salary_status="visible")
                 return result
 
     # 2) Fallback: tìm text salary trong DOM
     salary_node = soup.find(class_=re.compile(r"salary", re.I))
     if salary_node:
         txt = salary_node.get_text(strip=True)
+        result["salary_status"] = salary_status_from_text(txt)
         if "sign in" not in txt.lower() and txt:
+            cur = detect_currency(txt) or "USD"
             lo, hi = parse_salary(txt)
             if lo or hi:
-                result["salary_min_usd"] = lo
-                result["salary_max_usd"] = hi
-                result["salary_currency"] = "USD"
-                result["salary_source"] = "dom-text"
+                result.update(salary_min_usd=lo, salary_max_usd=hi,
+                              salary_currency=cur, salary_source="dom-text")
     return result
 
 
@@ -244,12 +358,17 @@ def enrich_with_details(jobs: List[Dict], fetcher, max_jobs: int = 100) -> List[
             continue
 
         detail = parse_job_detail(html)
+        if detail.get("salary_status"):
+            job["salary_status"] = detail["salary_status"]
         if detail.get("salary_min_usd") or detail.get("salary_max_usd"):
-            job["salary_min_usd"] = detail["salary_min_usd"]
-            job["salary_max_usd"] = detail["salary_max_usd"]
+            cur = detail.get("salary_currency", "") or "USD"
+            # Quy đổi về USD để cột salary_*_usd nhất quán giữa các job.
+            job["salary_min_usd"] = to_usd(detail["salary_min_usd"], cur)
+            job["salary_max_usd"] = to_usd(detail["salary_max_usd"], cur)
+            job["salary_currency"] = cur
+            job["salary_status"] = "visible"
             job["salary"] = (
-                f"{detail['salary_min_usd']}-{detail['salary_max_usd']} "
-                f"{detail['salary_currency']}".strip()
+                f"{detail['salary_min_usd']}-{detail['salary_max_usd']} {cur}".strip()
             )
             enriched += 1
 

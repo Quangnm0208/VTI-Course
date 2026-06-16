@@ -59,6 +59,11 @@ jobs:
           PAGES: ${{ github.event.inputs.pages || '30' }}
           # Enrich 200 job đầu để lấy salary từ JSON-LD (~6 phút trên runner)
           ENRICH: ${{ github.event.inputs.enrich || '200' }}
+          # (Tùy chọn) cookie phiên đăng nhập ItViec để MỞ KHÓA lương bị ẩn.
+          # Thêm tại Settings -> Secrets -> Actions -> ITVIEC_COOKIE. Không có
+          # secret thì salary_status='login_required' (không bịa số).
+          ITVIEC_COOKIE: ${{ secrets.ITVIEC_COOKIE }}
+          VND_PER_USD: ${{ vars.VND_PER_USD || '25000' }}
         run: |
           python scripts/scrape_itviec.py \
             --pages "$PAGES" \

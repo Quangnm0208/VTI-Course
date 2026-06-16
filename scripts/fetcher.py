@@ -17,18 +17,24 @@ from typing import Optional
 
 import requests
 
-from config import HTTP_HEADERS, REQUEST_TIMEOUT
+from config import HTTP_HEADERS, REQUEST_TIMEOUT, ITVIEC_COOKIE
 
 log = logging.getLogger(__name__)
+
+
+def _cookie_header() -> dict:
+    """Header Cookie từ phiên đăng nhập (nếu có) để mở khóa lương bị ẩn."""
+    return {"Cookie": ITVIEC_COOKIE} if ITVIEC_COOKIE else {}
 
 
 # -----------------------------------------------------------------------------
 # Engine 1: requests (mặc định nhanh nhưng dễ bị block)
 # -----------------------------------------------------------------------------
 def fetch_with_requests(url: str) -> Optional[str]:
-    """Tải HTML bằng requests. Trả về None nếu lỗi."""
+    """Tải HTML bằng requests. Tự gắn cookie đăng nhập nếu có ITVIEC_COOKIE."""
     try:
-        resp = requests.get(url, headers=HTTP_HEADERS, timeout=REQUEST_TIMEOUT)
+        headers = {**HTTP_HEADERS, **_cookie_header()}
+        resp = requests.get(url, headers=headers, timeout=REQUEST_TIMEOUT)
         resp.raise_for_status()
         return resp.text
     except requests.RequestException as err:
@@ -91,7 +97,46 @@ class PlaywrightFetcher:
             "Object.defineProperty(navigator, 'webdriver', {get: () => undefined})"
         )
 
+        # Nạp cookie phiên đăng nhập (nếu có) -> mở khóa lương bị ẩn sau login wall.
+        self._load_login_cookies()
+
         return self
+
+    def _load_login_cookies(self) -> None:
+        """
+        Nạp cookie đăng nhập ItViec theo 2 cách (tùy chọn, không bắt buộc):
+          1. ITVIEC_COOKIE: chuỗi 'name=value; name2=value2' copy từ trình duyệt.
+          2. ITVIEC_EMAIL/ITVIEC_PASSWORD: tự đăng nhập qua form.
+        Không có gì -> chạy ở chế độ khách (lương sẽ là login_required).
+        """
+        from config import ITVIEC_COOKIE, ITVIEC_EMAIL, ITVIEC_PASSWORD
+
+        if ITVIEC_COOKIE:
+            cookies = []
+            for part in ITVIEC_COOKIE.split(";"):
+                if "=" in part:
+                    name, value = part.strip().split("=", 1)
+                    cookies.append({"name": name, "value": value,
+                                    "domain": ".itviec.com", "path": "/"})
+            if cookies:
+                self._context.add_cookies(cookies)
+                log.info("[playwright] Đã nạp %d cookie đăng nhập", len(cookies))
+            return
+
+        if ITVIEC_EMAIL and ITVIEC_PASSWORD:
+            try:
+                page = self._context.new_page()
+                page.goto("https://itviec.com/sign_in",
+                          wait_until="domcontentloaded",
+                          timeout=REQUEST_TIMEOUT * 1000)
+                page.fill("input[type=email], #user_email", ITVIEC_EMAIL)
+                page.fill("input[type=password], #user_password", ITVIEC_PASSWORD)
+                page.click("button[type=submit], input[type=submit]")
+                page.wait_for_timeout(4000)
+                log.info("[playwright] Đã đăng nhập ItViec bằng email/password")
+                page.close()
+            except Exception as err:
+                log.warning("[playwright] Đăng nhập thất bại: %s", err)
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:

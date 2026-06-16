@@ -16,9 +16,9 @@ venv/
 .DS_Store
 Thumbs.db
 
-# Data (giữ nguyên data/itviec_jobs.csv để CI commit ngược về)
+# Data: chỉ bỏ qua dữ liệu RAW (vd Final Project.csv + scrape raw).
+# data/clean/ và data/processed/ chứa SẢN PHẨM NỘP nên được commit.
 data/raw/
-data/clean/
 *.tmp_*.csv
 quality_report.md
 

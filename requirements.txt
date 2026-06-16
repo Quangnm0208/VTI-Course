@@ -5,3 +5,7 @@ beautifulsoup4>=4.12.0
 lxml>=4.9.0
 openpyxl>=3.1.0
 playwright>=1.40.0
+# Phân tích & sản phẩm trình bày
+plotly>=5.20.0          # dashboard tương tác (powerbi/dashboard.html)
+python-pptx>=0.6.23     # sinh docs/presentation.pptx
+pytest>=7.0.0           # chạy test
