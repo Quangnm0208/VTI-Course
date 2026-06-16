@@ -1,0 +1,6 @@
+tier,annual_usd_min,annual_usd_max,kind,source
+VN Junior,10000,18000,vietnam,TopDev/Reco 2024-2026
+VN Mid-level,18000,30000,vietnam,TopDev/Reco 2024-2026
+VN Senior,25000,35000,vietnam,TopDev/Reco 2024-2026
+VN Remote (avg expectation 2024),45848,45848,vietnam_reference,Statista via kvytechnology 2024
+Global median (benchmark),57844,57844,global_reference,Stack Overflow Developer Survey

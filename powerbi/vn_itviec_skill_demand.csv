@@ -1,0 +1,30 @@
+skill,jobs_count,pct_of_jobs
+English,283,23.6
+Python,231,19.3
+AI,231,19.3
+Java,197,16.4
+SQL,179,14.9
+AWS,138,11.5
+Agile,136,11.3
+Cloud,112,9.3
+JavaScript,107,8.9
+Database,107,8.9
+API,100,8.3
+Project Management,95,7.9
+Business Analysis,89,7.4
+ReactJS,83,6.9
+QA QC,82,6.8
+Tester,80,6.7
+Linux,78,6.5
+DevOps,76,6.3
+Scrum,73,6.1
+Microservices,72,6.0
+LLM,70,5.8
+Spring Boot,67,5.6
+CI/CD,66,5.5
+Machine Learning,65,5.4
+PostgreSql,63,5.3
+Team Management,59,4.9
+C++,57,4.8
+Golang,57,4.8
+.NET,56,4.7

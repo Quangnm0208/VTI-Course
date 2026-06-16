@@ -1,4 +1,81 @@
-<!doctype html>
+"""
+build_dashboard_pro.py — Dashboard 4 trang theo thiết kế handoff (chuyên nghiệp).
+
+Sinh powerbi/dashboard.html: bản dashboard tương tác mở bằng trình duyệt, bám đúng
+giao diện trong gói handoff (font Inter + JetBrains Mono, bảng màu chàm, 4 trang,
+bộ lọc Tín hiệu + Top N). Dữ liệu nhúng sẵn (JSON) — mở là chạy, không cần server.
+
+Trang:
+    01 Tổng quan (Executive Overview)
+    02 Cung–cầu kỹ năng (Skill Demand Deep Dive)
+    03 Việt Nam · ItViec
+    04 Khuyến nghị · Chiến lược
+
+Chạy: python analysis/build_dashboard_pro.py
+"""
+from __future__ import annotations
+
+import csv
+import json
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT / "analysis"))
+import market_insight_data as M  # noqa: E402
+
+PBI = ROOT / "powerbi"
+OUT = PBI / "dashboard.html"
+
+PAL = {
+    "primary": "#3b3fbf", "primaryDark": "#1b1e6b", "accent": "#6e76dd",
+    "accentSoft": "#939ae6", "lav": "#eef0fb", "ink": "#0f1014", "ink2": "#060608",
+    "muted": "#5b6678", "muted2": "#8a93a3", "border": "#e6e8ec", "bg": "#f3f4f7",
+    "card": "#ffffff", "emerging": "#10b981", "stable": "#6e76dd", "declining": "#dc2626",
+}
+
+
+def df_records(df):
+    return json.loads(df.to_json(orient="records"))
+
+
+def vn_csv(name):
+    with open(PBI / f"{name}.csv", encoding="utf-8-sig") as f:
+        return list(csv.DictReader(f))
+
+
+def build():
+    ov = M.dataset_overview().set_index("metric")["value"].to_dict()
+    data = {
+        "overview": ov,
+        "language": df_records(M.language_signal()),
+        "database": df_records(M.database_signal()),
+        "ide": df_records(M.ide_overall()),
+        "salary": df_records(M.salary_by_language()),
+        "role": df_records(M.role_priority()),
+        "country": df_records(M.country_distribution()),
+        "roadmap": df_records(M.training_roadmap()),
+        "rubric": df_records(M.interview_rubric()),
+        "recs": df_records(M.strategic_recommendations()),
+        "vn_demand": [{"skill": r["skill"], "jobs_count": int(r["jobs_count"]),
+                       "pct_of_jobs": float(r["pct_of_jobs"])} for r in vn_csv("vn_itviec_skill_demand")],
+        "vn_salary": [{"tier": r["tier"], "min": int(r["annual_usd_min"]),
+                       "max": int(r["annual_usd_max"]), "kind": r["kind"], "source": r["source"]}
+                      for r in vn_csv("vn_salary_benchmark")],
+        "vn_cmp": [{"rank": int(r["rank"]), "vn_skill": r["vn_skill"],
+                    "vn_pct": float(r["vn_pct_of_jd"]), "global_language": r["global_language"],
+                    "global_worked": int(r["global_worked"])} for r in vn_csv("vn_vs_global_compare")],
+    }
+    payload = json.dumps(data, ensure_ascii=False)
+    pal = json.dumps(PAL)
+
+    html = HTML_TEMPLATE.replace("/*__PALETTE__*/", pal).replace("/*__DATA__*/", payload)
+    OUT.write_text(html, encoding="utf-8")
+    kb = OUT.stat().st_size / 1024
+    print(f"[ok] dashboard 4 trang -> {OUT.relative_to(ROOT)} ({kb:.0f} KB)")
+
+
+HTML_TEMPLATE = r"""<!doctype html>
 <html lang="vi"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VTI Skill Market — Dashboard</title>
@@ -94,8 +171,8 @@ body{margin:0;font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var
 </div>
 
 <script>
-const PAL = {"primary": "#3b3fbf", "primaryDark": "#1b1e6b", "accent": "#6e76dd", "accentSoft": "#939ae6", "lav": "#eef0fb", "ink": "#0f1014", "ink2": "#060608", "muted": "#5b6678", "muted2": "#8a93a3", "border": "#e6e8ec", "bg": "#f3f4f7", "card": "#ffffff", "emerging": "#10b981", "stable": "#6e76dd", "declining": "#dc2626"};
-const D = {"overview": {"Total respondents": 11552.0, "Countries covered": 135.0, "Viet Nam responses": 12.0, "Median salary USD": 57844.0, "Median professional coding years": 5.0, "Employed full-time percentage": 96.2, "Avg languages worked per respondent": 5.2, "Avg languages desired per respondent": 4.9}, "language": [{"language": "JavaScript", "worked": 8805, "desired_next_year": 6715, "net_change": -2090, "growth_pct": -23.7, "desired_market_pct": 58.1, "signal": "Declining"}, {"language": "HTML/CSS", "worked": 7920, "desired_next_year": 5398, "net_change": -2522, "growth_pct": -31.8, "desired_market_pct": 46.7, "signal": "Declining"}, {"language": "Python", "worked": 4611, "desired_next_year": 5309, "net_change": 698, "growth_pct": 15.1, "desired_market_pct": 46.0, "signal": "Stable"}, {"language": "SQL", "worked": 7213, "desired_next_year": 5094, "net_change": -2119, "growth_pct": -29.4, "desired_market_pct": 44.1, "signal": "Declining"}, {"language": "TypeScript", "worked": 3269, "desired_next_year": 4140, "net_change": 871, "growth_pct": 26.6, "desired_market_pct": 35.8, "signal": "Emerging"}, {"language": "C#", "worked": 4346, "desired_next_year": 3639, "net_change": -707, "growth_pct": -16.3, "desired_market_pct": 31.5, "signal": "Stable"}, {"language": "Bash/Shell/PowerShell", "worked": 4694, "desired_next_year": 3135, "net_change": -1559, "growth_pct": -33.2, "desired_market_pct": 27.1, "signal": "Declining"}, {"language": "Java", "worked": 4556, "desired_next_year": 2987, "net_change": -1569, "growth_pct": -34.4, "desired_market_pct": 25.9, "signal": "Declining"}, {"language": "Go", "worked": 1133, "desired_next_year": 2813, "net_change": 1680, "growth_pct": 148.3, "desired_market_pct": 24.4, "signal": "Emerging"}, {"language": "Kotlin", "worked": 754, "desired_next_year": 1907, "net_change": 1153, "growth_pct": 152.9, "desired_market_pct": 16.5, "signal": "Emerging"}, {"language": "C++", "worked": 1964, "desired_next_year": 1645, "net_change": -319, "growth_pct": -16.2, "desired_market_pct": 14.2, "signal": "Stable"}, {"language": "Rust", "worked": 328, "desired_next_year": 1540, "net_change": 1212, "growth_pct": 369.5, "desired_market_pct": 13.3, "signal": "Emerging"}, {"language": "PHP", "worked": 2950, "desired_next_year": 1475, "net_change": -1475, "growth_pct": -50.0, "desired_market_pct": 12.8, "signal": "Declining"}, {"language": "WebAssembly", "worked": 136, "desired_next_year": 1417, "net_change": 1281, "growth_pct": 941.9, "desired_market_pct": 12.3, "signal": "Emerging"}, {"language": "C", "worked": 1601, "desired_next_year": 1040, "net_change": -561, "growth_pct": -35.0, "desired_market_pct": 9.0, "signal": "Declining"}], "database": [{"database": "PostgreSQL", "worked": 4153, "desired_next_year": 4386, "net_change": 233, "growth_pct": 5.6, "desired_market_pct": 38.0, "signal": "Stable"}, {"database": "MongoDB", "worked": 3058, "desired_next_year": 3703, "net_change": 645, "growth_pct": 21.1, "desired_market_pct": 32.1, "signal": "Emerging"}, {"database": "Redis", "worked": 2536, "desired_next_year": 3385, "net_change": 849, "growth_pct": 33.5, "desired_market_pct": 29.3, "signal": "Emerging"}, {"database": "MySQL", "worked": 5549, "desired_next_year": 3328, "net_change": -2221, "growth_pct": -40.0, "desired_market_pct": 28.8, "signal": "Declining"}, {"database": "Elasticsearch", "worked": 1980, "desired_next_year": 2898, "net_change": 918, "growth_pct": 46.4, "desired_market_pct": 25.1, "signal": "Emerging"}, {"database": "Microsoft SQL Server", "worked": 4170, "desired_next_year": 2747, "net_change": -1423, "growth_pct": -34.1, "desired_market_pct": 23.8, "signal": "Declining"}, {"database": "SQLite", "worked": 3292, "desired_next_year": 2465, "net_change": -827, "growth_pct": -25.1, "desired_market_pct": 21.3, "signal": "Declining"}, {"database": "Firebase", "worked": 1343, "desired_next_year": 1679, "net_change": 336, "growth_pct": 25.0, "desired_market_pct": 14.5, "signal": "Emerging"}, {"database": "MariaDB", "worked": 1724, "desired_next_year": 1400, "net_change": -324, "growth_pct": -18.8, "desired_market_pct": 12.1, "signal": "Stable"}, {"database": "DynamoDB", "worked": 839, "desired_next_year": 1056, "net_change": 217, "growth_pct": 25.9, "desired_market_pct": 9.1, "signal": "Emerging"}, {"database": "Cassandra", "worked": 403, "desired_next_year": 1023, "net_change": 620, "growth_pct": 153.8, "desired_market_pct": 8.9, "signal": "Emerging"}, {"database": "Oracle", "worked": 1761, "desired_next_year": 881, "net_change": -880, "growth_pct": -50.0, "desired_market_pct": 7.6, "signal": "Declining"}], "ide": [{"ide": "Visual Studio Code", "developer_count": 8559, "usage_pct": 55.0}, {"ide": "Visual Studio", "developer_count": 4732, "usage_pct": 30.4}, {"ide": "Notepad++", "developer_count": 4642, "usage_pct": 29.8}, {"ide": "IntelliJ", "developer_count": 3957, "usage_pct": 25.4}, {"ide": "Vim", "developer_count": 3382, "usage_pct": 21.7}, {"ide": "Android Studio", "developer_count": 2314, "usage_pct": 14.9}, {"ide": "PyCharm", "developer_count": 2237, "usage_pct": 14.4}, {"ide": "Sublime Text", "developer_count": 2201, "usage_pct": 14.1}, {"ide": "IPython / Jupyter", "developer_count": 2010, "usage_pct": 12.9}, {"ide": "Eclipse", "developer_count": 1789, "usage_pct": 11.5}], "salary": [{"language": "Clojure", "developer_count": 152, "median_salary": 93404, "mean_salary": 114203, "mean_vs_global_pct": 44.1}, {"language": "Go", "developer_count": 1060, "median_salary": 80000, "mean_salary": 98923, "mean_vs_global_pct": 24.8}, {"language": "Scala", "developer_count": 461, "median_salary": 79163, "mean_salary": 98884, "mean_vs_global_pct": 24.7}, {"language": "Ruby", "developer_count": 1094, "median_salary": 75000, "mean_salary": 94376, "mean_vs_global_pct": 19.0}, {"language": "Elixir", "developer_count": 169, "median_salary": 71966, "mean_salary": 89015, "mean_vs_global_pct": 12.3}, {"language": "Rust", "developer_count": 311, "median_salary": 70000, "mean_salary": 88382, "mean_vs_global_pct": 11.5}, {"language": "Bash/Shell/PowerShell", "developer_count": 4417, "median_salary": 68745, "mean_salary": 89946, "mean_vs_global_pct": 13.5}, {"language": "Objective-C", "developer_count": 483, "median_salary": 64115, "mean_salary": 87429, "mean_vs_global_pct": 10.3}, {"language": "Python", "developer_count": 4293, "median_salary": 64000, "mean_salary": 85750, "mean_vs_global_pct": 8.2}, {"language": "R", "developer_count": 552, "median_salary": 63016, "mean_salary": 85477, "mean_vs_global_pct": 7.8}, {"language": "Swift", "developer_count": 668, "median_salary": 60674, "mean_salary": 81501, "mean_vs_global_pct": 2.8}, {"language": "TypeScript", "developer_count": 3012, "median_salary": 60173, "mean_salary": 80456, "mean_vs_global_pct": 3.5}, {"language": "C#", "developer_count": 3993, "median_salary": 59112, "mean_salary": 79957, "mean_vs_global_pct": 1.6}, {"language": "JavaScript", "developer_count": 8136, "median_salary": 58000, "mean_salary": 79063, "mean_vs_global_pct": 0.0}, {"language": "SQL", "developer_count": 6687, "median_salary": 58284, "mean_salary": 78852, "mean_vs_global_pct": -0.7}, {"language": "Java", "developer_count": 4168, "median_salary": 53437, "mean_salary": 75838, "mean_vs_global_pct": -7.6}, {"language": "PHP", "developer_count": 2720, "median_salary": 43296, "mean_salary": 66879, "mean_vs_global_pct": -25.2}], "role": [{"role": "Full-stack Developer", "developer_count": 6928, "median_salary": 59000, "hiring_priority_score": 72.9, "priority_band": "Priority 1"}, {"role": "Back-end Developer", "developer_count": 6290, "median_salary": 56715, "hiring_priority_score": 65.9, "priority_band": "Priority 2"}, {"role": "DevOps Specialist", "developer_count": 1639, "median_salary": 71036, "hiring_priority_score": 46.1, "priority_band": "Priority 2"}, {"role": "Front-end Developer", "developer_count": 3920, "median_salary": 53437, "hiring_priority_score": 45.2, "priority_band": "Priority 2"}, {"role": "Product/BA", "developer_count": 1179, "median_salary": 61650, "hiring_priority_score": 33.3, "priority_band": "Priority 3"}, {"role": "Data/BI Analyst", "developer_count": 802, "median_salary": 61872, "hiring_priority_score": 30.8, "priority_band": "Priority 3"}, {"role": "Data Scientist / ML", "developer_count": 803, "median_salary": 60000, "hiring_priority_score": 28.9, "priority_band": "Priority 3"}, {"role": "Mobile Developer", "developer_count": 1959, "median_salary": 46152, "hiring_priority_score": 23.5, "priority_band": "Priority 3"}], "country": [{"country": "United States", "count": 3173, "pct": 27.5}, {"country": "India", "count": 911, "pct": 7.9}, {"country": "United Kingdom", "count": 841, "pct": 7.3}, {"country": "Germany", "count": 715, "pct": 6.2}, {"country": "Canada", "count": 442, "pct": 3.8}, {"country": "France", "count": 339, "pct": 2.9}, {"country": "Brazil", "count": 328, "pct": 2.8}, {"country": "Australia", "count": 287, "pct": 2.5}], "roadmap": [{"phase": "Week 1", "training_block": "VS Code, Git and working environment", "target_roles": "All technical roles", "hr_reason": "Tạo nền công cụ chung, rút ngắn onboarding."}, {"phase": "Week 2", "training_block": "SQL and PostgreSQL foundation", "target_roles": "Data, Backend, Full-stack", "hr_reason": "SQL là kỹ năng nền xuyên suốt mọi vai trò."}, {"phase": "Week 3", "training_block": "Role-specific stack", "target_roles": "Backend, Frontend, Mobile, Data, DevOps", "hr_reason": "Chuyên sâu theo track ưu tiên tuyển dụng."}, {"phase": "Week 4", "training_block": "Project, interview and communication review", "target_roles": "All technical roles", "hr_reason": "Bằng chứng dự án + chấm theo rubric 100 điểm."}], "rubric": [{"assessment_area": "Core technical skill", "weight_pct": 25, "what_to_test": "Ngôn ngữ/stack chính theo vai trò."}, {"assessment_area": "Data and database thinking", "weight_pct": 20, "what_to_test": "SQL, schema, PostgreSQL/NoSQL."}, {"assessment_area": "Project evidence", "weight_pct": 20, "what_to_test": "Dự án, portfolio, giải quyết bài toán nghiệp vụ."}, {"assessment_area": "Tooling and workflow", "weight_pct": 15, "what_to_test": "VS Code, Git, debug, môi trường."}, {"assessment_area": "Problem solving", "weight_pct": 10, "what_to_test": "Tư duy thuật toán/logic."}, {"assessment_area": "Communication", "weight_pct": 10, "what_to_test": "Trình bày, làm việc nhóm."}], "recs": [{"horizon": "Ngắn hạn (quý này)", "recommendation": "Mở track Cloud & DevOps (Docker/Kubernetes/AWS) + Python for Data", "evidence": "Cloud/DevOps median salary cao nhất ($71k) và Elasticsearch/Redis tăng trưởng 30-46%. Cầu lớn, cung còn ít -> học viên ra trường có việc ngay."}, {"horizon": "Trung hạn (6 tháng)", "recommendation": "Đưa TypeScript, Go, Kotlin, Rust vào lộ trình nâng cao", "evidence": "Net-change muốn-dùng dương lớn: Rust +370%, Kotlin +153%, Go +148%, TypeScript +27%. Đón đầu xu hướng 2-3 năm tới."}, {"horizon": "Dài hạn (1 năm)", "recommendation": "Lấy PostgreSQL + VS Code + Git làm nền chung cho mọi track và duy trì pipeline scraping ItViec để tái phân tích mỗi quý", "evidence": "VS Code thống lĩnh ~55% mọi vai trò; PostgreSQL vừa phổ biến vừa tăng. Thị trường đổi 6 tháng/lần -> cần dữ liệu cập nhật liên tục."}], "vn_demand": [{"skill": "English", "jobs_count": 283, "pct_of_jobs": 23.6}, {"skill": "Python", "jobs_count": 231, "pct_of_jobs": 19.3}, {"skill": "AI", "jobs_count": 231, "pct_of_jobs": 19.3}, {"skill": "Java", "jobs_count": 197, "pct_of_jobs": 16.4}, {"skill": "SQL", "jobs_count": 179, "pct_of_jobs": 14.9}, {"skill": "AWS", "jobs_count": 138, "pct_of_jobs": 11.5}, {"skill": "Agile", "jobs_count": 136, "pct_of_jobs": 11.3}, {"skill": "Cloud", "jobs_count": 112, "pct_of_jobs": 9.3}, {"skill": "JavaScript", "jobs_count": 107, "pct_of_jobs": 8.9}, {"skill": "Database", "jobs_count": 107, "pct_of_jobs": 8.9}, {"skill": "API", "jobs_count": 100, "pct_of_jobs": 8.3}, {"skill": "Project Management", "jobs_count": 95, "pct_of_jobs": 7.9}, {"skill": "Business Analysis", "jobs_count": 89, "pct_of_jobs": 7.4}, {"skill": "ReactJS", "jobs_count": 83, "pct_of_jobs": 6.9}, {"skill": "QA QC", "jobs_count": 82, "pct_of_jobs": 6.8}, {"skill": "Tester", "jobs_count": 80, "pct_of_jobs": 6.7}, {"skill": "Linux", "jobs_count": 78, "pct_of_jobs": 6.5}, {"skill": "DevOps", "jobs_count": 76, "pct_of_jobs": 6.3}, {"skill": "Scrum", "jobs_count": 73, "pct_of_jobs": 6.1}, {"skill": "Microservices", "jobs_count": 72, "pct_of_jobs": 6.0}, {"skill": "LLM", "jobs_count": 70, "pct_of_jobs": 5.8}, {"skill": "Spring Boot", "jobs_count": 67, "pct_of_jobs": 5.6}, {"skill": "CI/CD", "jobs_count": 66, "pct_of_jobs": 5.5}, {"skill": "Machine Learning", "jobs_count": 65, "pct_of_jobs": 5.4}, {"skill": "PostgreSql", "jobs_count": 63, "pct_of_jobs": 5.3}, {"skill": "Team Management", "jobs_count": 59, "pct_of_jobs": 4.9}, {"skill": "C++", "jobs_count": 57, "pct_of_jobs": 4.8}, {"skill": "Golang", "jobs_count": 57, "pct_of_jobs": 4.8}, {"skill": ".NET", "jobs_count": 56, "pct_of_jobs": 4.7}], "vn_salary": [{"tier": "VN Junior", "min": 10000, "max": 18000, "kind": "vietnam", "source": "TopDev/Reco 2024-2026"}, {"tier": "VN Mid-level", "min": 18000, "max": 30000, "kind": "vietnam", "source": "TopDev/Reco 2024-2026"}, {"tier": "VN Senior", "min": 25000, "max": 35000, "kind": "vietnam", "source": "TopDev/Reco 2024-2026"}, {"tier": "VN Remote (avg expectation 2024)", "min": 45848, "max": 45848, "kind": "vietnam_reference", "source": "Statista via kvytechnology 2024"}, {"tier": "Global median (benchmark)", "min": 57844, "max": 57844, "kind": "global_reference", "source": "Stack Overflow Developer Survey"}], "vn_cmp": [{"rank": 1, "vn_skill": "Python", "vn_pct": 19.3, "global_language": "JavaScript", "global_worked": 8805}, {"rank": 2, "vn_skill": "AI", "vn_pct": 19.3, "global_language": "HTML/CSS", "global_worked": 7920}, {"rank": 3, "vn_skill": "Java", "vn_pct": 16.4, "global_language": "SQL", "global_worked": 7213}, {"rank": 4, "vn_skill": "SQL", "vn_pct": 14.9, "global_language": "Python", "global_worked": 4611}, {"rank": 5, "vn_skill": "AWS", "vn_pct": 11.5, "global_language": "Java", "global_worked": 4556}]};
+const PAL = /*__PALETTE__*/;
+const D = /*__DATA__*/;
 let STATE = {page:'overview', signal:'all', topN:10};
 const SIGCOL = {Emerging:PAL.emerging, Stable:PAL.stable, Declining:PAL.declining};
 const FONT = {family:"Inter, sans-serif", size:12, color:PAL.ink};
@@ -257,4 +334,8 @@ document.getElementById('topSeg').addEventListener('click',e=>{const b=e.target.
   document.querySelectorAll('#topSeg button').forEach(x=>x.classList.remove('on'));b.classList.add('on');STATE.topN=+b.dataset.n;RENDER[STATE.page]();});
 show('overview');
 </script>
-</body></html>
+</body></html>"""
+
+
+if __name__ == "__main__":
+    build()
