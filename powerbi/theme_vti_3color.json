@@ -1,0 +1,21 @@
+{
+  "name": "VTI 3-Color",
+  "dataColors": ["#3b3fbf", "#10b981", "#94a3b8"],
+  "background": "#FFFFFF",
+  "foreground": "#0F172A",
+  "tableAccent": "#3b3fbf",
+  "good": "#10b981",
+  "neutral": "#94a3b8",
+  "bad": "#94a3b8",
+  "maximum": "#3b3fbf",
+  "center": "#94a3b8",
+  "minimum": "#10b981",
+  "visualStyles": {
+    "*": {
+      "*": {
+        "title": [{ "fontColor": { "solid": { "color": "#0F172A" } }, "fontSize": 12 }],
+        "*": [{ "responsive": true }]
+      }
+    }
+  }
+}
