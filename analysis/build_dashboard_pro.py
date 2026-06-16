@@ -127,7 +127,7 @@ body{margin:0;font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var
 .tbl th{color:var(--muted2);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em}
 .tbl td .mono{font-family:'JetBrains Mono';font-weight:700}
 .chip{display:inline-block;padding:2px 9px;border-radius:999px;font-size:11px;font-weight:600}
-.chip.Emerging{background:#dcfce7;color:#066848}.chip.Stable{background:#eef0fb;color:#3b3fbf}.chip.Declining{background:#fee2e2;color:#991b1b}
+.chip.Emerging{background:#dcfce7;color:#0b7a55}.chip.Stable{background:#eef0fb;color:#3b3fbf}.chip.Declining{background:#eef0f3;color:#5b6678}
 .reccard{background:#fff;border:1px solid var(--bd);border-left:5px solid var(--pri);border-radius:12px;padding:14px 16px}
 .reccard b{color:var(--priD)} .reccard .h{font-size:13px;color:var(--acc);font-weight:700;text-transform:uppercase;letter-spacing:.03em}
 .page{display:none}.page.show{display:block}
@@ -172,6 +172,10 @@ body{margin:0;font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var
 
 <script>
 const PAL = /*__PALETTE__*/;
+// Bảng màu rút gọn còn ĐÚNG 3 màu: chàm (chính) · xanh lá (tích cực) · xám (trung tính)
+const C1='#3b3fbf', C2='#10b981', C3='#94a3b8';
+Object.assign(PAL,{primary:C1,primaryDark:C1,accent:C1,accentSoft:C3,stable:C1,
+  emerging:C2,declining:C3,muted2:C3});
 const D = /*__DATA__*/;
 let STATE = {page:'overview', signal:'all', topN:10};
 const SIGCOL = {Emerging:PAL.emerging, Stable:PAL.stable, Declining:PAL.declining};
@@ -297,7 +301,7 @@ function renderStrategy(){
        <table class="tbl"><thead><tr><th>Tuần</th><th>Nội dung</th></tr></thead><tbody>
        ${D.roadmap.map(r=>`<tr><td class="mono">${r.phase}</td><td>${r.training_block}</td></tr>`).join('')}</tbody></table></div></div>`;
   const rp=[...D.role].sort((a,b)=>a.hiring_priority_score-b.hiring_priority_score);
-  const band={'Priority 1':PAL.declining,'Priority 2':'#f59e0b','Priority 3':PAL.muted2||'#8a93a3'};
+  const band={'Priority 1':C2,'Priority 2':C1,'Priority 3':C3};
   Plotly.newPlot('s_role',[{type:'bar',orientation:'h',x:rp.map(r=>r.hiring_priority_score),y:rp.map(r=>r.role),
     marker:{color:rp.map(r=>band[r.priority_band])},text:rp.map(r=>r.hiring_priority_score),textposition:'auto'}],baseLayout('Ưu tiên tuyển dụng theo vai trò (điểm)'),CFG);
   const em=[...D.language,...D.database].filter(r=>r.signal==='Emerging').map(r=>({name:r.language||r.database,g:r.growth_pct}))

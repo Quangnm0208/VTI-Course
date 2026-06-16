@@ -323,9 +323,10 @@ def build():
         "datasetReference": {"byPath": {"path": f"../{NAME}.SemanticModel"}, "byConnection": None},
     })
     rdef = RPT / "definition"
+    # report.json: KHÔNG khai báo baseTheme để tránh "required artifact missing"
+    # (Power BI sẽ dùng theme mặc định). layoutOptimization để FitToPage.
     write(rdef / "report.json", {
         "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/report/2.0.0/schema.json",
-        "themeCollection": {"baseTheme": {"name": "CY24SU10"}},
         "layoutOptimization": "None",
     })
 
