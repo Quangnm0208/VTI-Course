@@ -323,6 +323,12 @@ def build():
         "datasetReference": {"byPath": {"path": f"../{NAME}.SemanticModel"}, "byConnection": None},
     })
     rdef = RPT / "definition"
+    # PBIR (enhanced report format) BẮT BUỘC có version.json ở gốc definition/
+    # — thiếu file này Power BI báo "Cannot find file 'version.json'".
+    write(rdef / "version.json", {
+        "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/versionMetadata/1.0.0/schema.json",
+        "version": "2.0.0",
+    })
     # report.json: KHÔNG khai báo baseTheme để tránh "required artifact missing"
     # (Power BI sẽ dùng theme mặc định). layoutOptimization để FitToPage.
     write(rdef / "report.json", {
