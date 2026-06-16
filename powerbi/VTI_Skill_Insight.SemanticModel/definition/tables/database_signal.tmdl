@@ -1,0 +1,84 @@
+table database_signal
+	lineageTag: f14be330-ed40-59d2-8f53-8250c89b7eb7
+
+	column database
+		dataType: string
+		lineageTag: 3512fdb6-2a88-5c3f-8610-1d80270657a1
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [database]
+
+	column worked
+		dataType: int64
+		formatString: 0
+		lineageTag: 0952adf7-7a4a-5e9d-861f-d4538d57afdd
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [worked]
+
+	column desired_next_year
+		dataType: int64
+		formatString: 0
+		lineageTag: 233b91d0-9c02-5dc9-b575-aa8524cadec9
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [desired_next_year]
+
+	column net_change
+		dataType: int64
+		formatString: 0
+		lineageTag: 08c014a4-2018-5e1e-95a0-99da7fd46606
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [net_change]
+
+	column growth_pct
+		dataType: double
+		formatString: 0.0
+		lineageTag: 50196db6-e440-5aa0-adaf-d47840031036
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [growth_pct]
+
+	column desired_market_pct
+		dataType: double
+		formatString: 0.0
+		lineageTag: fdfdd353-be2b-565a-8f30-48dee0fa1d73
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [desired_market_pct]
+
+	column signal
+		dataType: string
+		lineageTag: 5be3fb8d-6f7c-5519-82c0-12fa25cd2a80
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [signal]
+
+	partition database_signal = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"database", STRING,
+				"worked", INTEGER,
+				"desired_next_year", INTEGER,
+				"net_change", INTEGER,
+				"growth_pct", DOUBLE,
+				"desired_market_pct", DOUBLE,
+				"signal", STRING,
+				{
+					{"PostgreSQL", 4153, 4386, 233, 5.6, 38.0, "Stable"},
+					{"MongoDB", 3058, 3703, 645, 21.1, 32.1, "Emerging"},
+					{"Redis", 2536, 3385, 849, 33.5, 29.3, "Emerging"},
+					{"MySQL", 5549, 3328, -2221, -40.0, 28.8, "Declining"},
+					{"Elasticsearch", 1980, 2898, 918, 46.4, 25.1, "Emerging"},
+					{"Microsoft SQL Server", 4170, 2747, -1423, -34.1, 23.8, "Declining"},
+					{"SQLite", 3292, 2465, -827, -25.1, 21.3, "Declining"},
+					{"Firebase", 1343, 1679, 336, 25.0, 14.5, "Emerging"},
+					{"MariaDB", 1724, 1400, -324, -18.8, 12.1, "Stable"},
+					{"DynamoDB", 839, 1056, 217, 25.9, 9.1, "Emerging"},
+					{"Cassandra", 403, 1023, 620, 153.8, 8.9, "Emerging"},
+					{"Oracle", 1761, 881, -880, -50.0, 7.6, "Declining"}
+				}
+			)
+		```

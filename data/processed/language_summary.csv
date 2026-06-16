@@ -1,0 +1,16 @@
+﻿skill_name,count,growth_pct,signal,category
+JavaScript,8805,-23.7,Declining,programming_language
+HTML/CSS,7920,-31.8,Declining,programming_language
+Python,4611,15.1,Stable,programming_language
+SQL,7213,-29.4,Declining,programming_language
+TypeScript,3269,26.6,Emerging,programming_language
+C#,4346,-16.3,Stable,programming_language
+Bash/Shell/PowerShell,4694,-33.2,Declining,programming_language
+Java,4556,-34.4,Declining,programming_language
+Go,1133,148.3,Emerging,programming_language
+Kotlin,754,152.9,Emerging,programming_language
+C++,1964,-16.2,Stable,programming_language
+Rust,328,369.5,Emerging,programming_language
+PHP,2950,-50.0,Declining,programming_language
+WebAssembly,136,941.9,Emerging,programming_language
+C,1601,-35.0,Declining,programming_language

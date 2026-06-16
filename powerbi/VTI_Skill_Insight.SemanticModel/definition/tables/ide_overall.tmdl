@@ -1,0 +1,47 @@
+table ide_overall
+	lineageTag: d23ba789-8bb0-5d94-9832-a349dc1e777a
+
+	column ide
+		dataType: string
+		lineageTag: cb5e8494-4661-5263-ac41-3586486d05ee
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [ide]
+
+	column developer_count
+		dataType: int64
+		formatString: 0
+		lineageTag: de2640b1-4f62-53bc-9014-136ff63ec3d1
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [developer_count]
+
+	column usage_pct
+		dataType: double
+		formatString: 0.0
+		lineageTag: 230968ed-09fc-5a87-b674-6ca031bdfa3a
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [usage_pct]
+
+	partition ide_overall = calculated
+		mode: import
+		source = ```
+			DATATABLE(
+				"ide", STRING,
+				"developer_count", INTEGER,
+				"usage_pct", DOUBLE,
+				{
+					{"Visual Studio Code", 8559, 55.0},
+					{"Visual Studio", 4732, 30.4},
+					{"Notepad++", 4642, 29.8},
+					{"IntelliJ", 3957, 25.4},
+					{"Vim", 3382, 21.7},
+					{"Android Studio", 2314, 14.9},
+					{"PyCharm", 2237, 14.4},
+					{"Sublime Text", 2201, 14.1},
+					{"IPython / Jupyter", 2010, 12.9},
+					{"Eclipse", 1789, 11.5}
+				}
+			)
+		```

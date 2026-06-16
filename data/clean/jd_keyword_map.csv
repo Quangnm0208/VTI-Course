@@ -1,0 +1,9 @@
+﻿role,hiring_track,must_have_keywords,growth_keywords
+Full-stack Developer,Full-stack Engineering,"JavaScript, TypeScript, React, SQL, Git","Node.js, PostgreSQL, Docker, Cloud"
+Back-end Developer,Backend Engineering,"Java, Spring, SQL, PostgreSQL, API, Git","Go, TypeScript, Docker, Kubernetes, Redis"
+DevOps Specialist,Cloud and DevOps,"Linux, Docker, Kubernetes, AWS, CI/CD","Kubernetes, Terraform, Cloud, Monitoring"
+Front-end Developer,Frontend Engineering,"JavaScript, HTML/CSS, React, TypeScript, Git","TypeScript, Vue.js, Testing, API"
+Product/BA,Product and Business Analysis,"Requirement Analysis, SQL, Stakeholder, User Story","Data-driven Product, Experiment, Dashboard"
+Data/BI Analyst,Data Analytics,"SQL, Python, Excel, Power BI, Data Visualization","PostgreSQL, Python, Dashboard, Business Metrics"
+Data Scientist / ML,Data Science and ML,"Python, SQL, Statistics, Machine Learning, Jupyter","PyTorch, TensorFlow, Cloud, MLOps"
+Mobile Developer,Mobile Engineering,"Kotlin, Android Studio, Swift, Xcode, API","Kotlin, Flutter, Mobile CI/CD"

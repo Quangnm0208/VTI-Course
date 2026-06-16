@@ -1,0 +1,16 @@
+﻿language,worked,desired_next_year,net_change,growth_pct,desired_market_pct,signal
+JavaScript,8805,6715,-2090,-23.7,58.1,Declining
+HTML/CSS,7920,5398,-2522,-31.8,46.7,Declining
+Python,4611,5309,698,15.1,46.0,Stable
+SQL,7213,5094,-2119,-29.4,44.1,Declining
+TypeScript,3269,4140,871,26.6,35.8,Emerging
+C#,4346,3639,-707,-16.3,31.5,Stable
+Bash/Shell/PowerShell,4694,3135,-1559,-33.2,27.1,Declining
+Java,4556,2987,-1569,-34.4,25.9,Declining
+Go,1133,2813,1680,148.3,24.4,Emerging
+Kotlin,754,1907,1153,152.9,16.5,Emerging
+C++,1964,1645,-319,-16.2,14.2,Stable
+Rust,328,1540,1212,369.5,13.3,Emerging
+PHP,2950,1475,-1475,-50.0,12.8,Declining
+WebAssembly,136,1417,1281,941.9,12.3,Emerging
+C,1601,1040,-561,-35.0,9.0,Declining

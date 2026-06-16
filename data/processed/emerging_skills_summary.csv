@@ -1,0 +1,16 @@
+﻿skill_name,worked,desired_next_year,growth_gap,growth_pct,signal
+Go,1133,2813,1680,148.3,Emerging
+WebAssembly,136,1417,1281,941.9,Emerging
+Rust,328,1540,1212,369.5,Emerging
+Kotlin,754,1907,1153,152.9,Emerging
+TypeScript,3269,4140,871,26.6,Emerging
+Python,4611,5309,698,15.1,Stable
+C++,1964,1645,-319,-16.2,Stable
+C,1601,1040,-561,-35.0,Declining
+C#,4346,3639,-707,-16.3,Stable
+PHP,2950,1475,-1475,-50.0,Declining
+Bash/Shell/PowerShell,4694,3135,-1559,-33.2,Declining
+Java,4556,2987,-1569,-34.4,Declining
+JavaScript,8805,6715,-2090,-23.7,Declining
+SQL,7213,5094,-2119,-29.4,Declining
+HTML/CSS,7920,5398,-2522,-31.8,Declining

@@ -1,0 +1,42 @@
+table Measures
+	lineageTag: 33c5c656-c7cb-5965-86c4-259603706be2
+
+	measure 'Total Respondents' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Total respondents"))
+		formatString: #,0
+		lineageTag: cbb0f78e-e45a-5d58-b79b-93d3ff5d5652
+
+	measure 'Total Countries' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Countries covered"))
+		formatString: 0
+		lineageTag: 75233897-5f2a-5842-8c27-7a284dbf87a1
+
+	measure 'Median Salary USD' = CALCULATE(MAXX(dataset_overview, dataset_overview[value]), FILTER(dataset_overview, dataset_overview[metric] = "Median salary USD"))
+		formatString: \$#,0
+		lineageTag: 1c7de770-c410-5c48-9d54-e54e06bcd470
+
+	measure 'Top Desired Language' = MAXX(TOPN(1, ALL(language_signal), language_signal[desired_next_year], DESC), language_signal[language])
+		lineageTag: 2e385c43-887f-5acf-818f-62ebed11d445
+
+	measure 'Top Database' = MAXX(TOPN(1, ALL(database_signal), database_signal[desired_next_year], DESC), database_signal[database])
+		lineageTag: 7fdde4b0-299f-5ff7-88f9-bfba05c090f5
+
+	measure 'Emerging Language Count' = CALCULATE(COUNTROWS(language_signal), language_signal[signal] = "Emerging")
+		formatString: 0
+		lineageTag: 03e5ffea-00f7-5ecd-91ec-91148a87d5f9
+
+	measure 'Total Desired (Languages)' = SUM(language_signal[desired_next_year])
+		formatString: #,0
+		lineageTag: 32ea7a9b-26ff-5e91-bb1d-a455d9730ca0
+
+	column _hidden
+		dataType: int64
+		isHidden
+		lineageTag: 098d139c-4caf-5471-aec1-02a6aac40b76
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [_hidden]
+
+	partition Measures = calculated
+		mode: import
+		source = ```
+			DATATABLE("_hidden", INTEGER, {{0}})
+		```

@@ -1,0 +1,11 @@
+﻿skill_name,count,percentage,category
+Visual Studio Code,8559,55.0,ide
+Visual Studio,4732,30.4,ide
+Notepad++,4642,29.8,ide
+IntelliJ,3957,25.4,ide
+Vim,3382,21.7,ide
+Android Studio,2314,14.9,ide
+PyCharm,2237,14.4,ide
+Sublime Text,2201,14.1,ide
+IPython / Jupyter,2010,12.9,ide
+Eclipse,1789,11.5,ide
