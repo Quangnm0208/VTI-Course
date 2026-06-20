@@ -9,9 +9,9 @@ của đề bài.
     body: {"userId":0,"query":"<keyword>","filter":[...],"ranges":[],
            "order":[],"hitsPerPage":50,"page":<n>,"retrieveFields":[...]}
 
-⚠️ GIỚI HẠN MÔI TRƯỜNG: trong môi trường CI nội bộ, mọi host KHÁC GitHub
-đều bị chặn egress (403) nên script này KHÔNG chạy được ở đây. Nó chạy bình
-thường trên máy cá nhân hoặc runner có internet mở. KHÔNG bịa dữ liệu khi bị chặn.
+Lưu ý: API có thể chặn IP datacenter (403) — nên chạy ở mạng dân cư hoặc runner
+có internet mở. Khi không lấy được dữ liệu, script ghi log lỗi và dừng, không ghi
+bản ghi rỗng.
 
 Cách dùng:
     python scripts/scrape_vietnamworks.py --pages 20 --query "developer"
@@ -137,8 +137,8 @@ def main() -> int:
     queries = args.query or DEFAULT_QUERIES
     rows = scrape(queries, args.pages, today_vn())
     if not rows:
-        log.error("Không thu được job (có thể bị chặn egress hoặc API đổi schema). "
-                  "Chạy trên máy có internet mở. KHÔNG ghi dữ liệu giả.")
+        log.error("Không thu được job (có thể bị chặn anti-bot hoặc API đổi schema). "
+                  "Chạy ở mạng dân cư có internet mở; script không ghi bản ghi rỗng.")
         return 2
     if args.dry_run:
         log.info("[DRY-RUN] thu %d job, không ghi.", len(rows))

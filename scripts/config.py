@@ -48,7 +48,7 @@ HTTP_HEADERS = {
 #                     (DevTools -> Application -> Cookies -> copy header 'Cookie').
 #   - Hoặc ITVIEC_EMAIL + ITVIEC_PASSWORD : Playwright tự đăng nhập.
 # Không có thông tin này, scraper vẫn chạy nhưng đánh dấu salary_status=
-# 'login_required' thay vì bịa số.
+# 'login_required' thay vì ước đoán.
 ITVIEC_COOKIE = os.environ.get("ITVIEC_COOKIE", "").strip()
 ITVIEC_EMAIL = os.environ.get("ITVIEC_EMAIL", "").strip()
 ITVIEC_PASSWORD = os.environ.get("ITVIEC_PASSWORD", "").strip()

@@ -143,7 +143,7 @@ body{margin:0;font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var
      <button data-p="vietnam"><span class="num">03</span> Việt Nam · ItViec</button>
      <button data-p="strategy"><span class="num">04</span> Khuyến nghị</button>
    </nav>
-   <div class="foot">Nguồn dữ liệu (thật, không bịa): <b>Stack Overflow Survey</b> 11.552 dev / 135 quốc gia · <b>GitHub API</b> 7.600 repo (nhu cầu công nghệ) · <b>ItViec</b> 1.200 JD (610 job unique, 29/05/2026). Tổng ~20.300 bản ghi từ 3 nguồn. "1.200" là riêng ItViec, không phải toàn bộ.</div>
+   <div class="foot">Nguồn dữ liệu thực tế: <b>Stack Overflow Survey</b> 11.552 dev / 135 quốc gia · <b>GitHub API</b> 7.600 repo (nhu cầu công nghệ) · <b>ItViec</b> 1.200 JD (610 job unique, 29/05/2026). Tổng ~20.300 bản ghi từ 3 nguồn. "1.200" là riêng ItViec, không phải toàn bộ.</div>
  </aside>
  <main class="main">
    <div class="head">

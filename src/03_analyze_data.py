@@ -8,7 +8,7 @@ Luồng (theo yêu cầu đề bài):
 
 Đầu vào (ưu tiên theo thứ tự):
     data/raw/Final Project.csv  hoặc  data/raw/final_project.csv
-Nếu KHÔNG có file raw (chưa upload), script KHÔNG bịa dữ liệu mà dùng lại bộ
+Nếu KHÔNG có file raw, script dùng lại bộ
 số liệu tổng hợp đã chốt trong analysis/market_insight_data.py (chính là kết
 quả tính từ notebook trên dữ liệu thật) để vẫn xuất được các bảng summary.
 
@@ -106,12 +106,12 @@ def run_from_raw(raw_path: Path) -> None:
 
 
 # -----------------------------------------------------------------------------
-# Nhánh B: KHÔNG có raw -> dùng số liệu tổng hợp đã chốt (không bịa)
+# Nhánh B: KHÔNG có raw -> dùng số liệu tổng hợp đã chốt
 # -----------------------------------------------------------------------------
 def run_from_aggregates() -> None:
     log.warning("Không tìm thấy 'Final Project.csv' trong data/raw/. "
                 "Dùng bộ số liệu tổng hợp đã chốt (analysis/market_insight_data.py) "
-                "— đây là kết quả tính từ dữ liệu thật, KHÔNG phải số bịa.")
+                "— đây là kết quả đã tính sẵn từ dữ liệu khảo sát gốc.")
     import market_insight_data as M  # noqa: E402
 
     lang = M.language_signal()

@@ -9,13 +9,13 @@ là API mà trang kết quả tìm việc gọi để tải thêm thẻ job:
 
 Trả về một đoạn HTML gồm các <li> thẻ job -> parse bằng BeautifulSoup.
 
-⚠️ LƯU Ý QUAN TRỌNG:
+⚠️ LƯU Ý:
   - Chỉ dùng endpoint CÔNG KHAI, KHÔNG đăng nhập, KHÔNG vượt tường đăng nhập.
   - Tôn trọng Điều khoản dịch vụ & robots của LinkedIn; chỉ phục vụ mục đích
     học tập, thu thập lượng nhỏ với delay lịch sự. Không dùng cho mục đích thương mại.
-  - GIỚI HẠN MÔI TRƯỜNG: sandbox nội bộ chặn mọi host khác GitHub (403) nên
-    script KHÔNG chạy được ở đây; chạy trên máy cá nhân/CI có internet mở.
-  - KHÔNG bịa dữ liệu khi bị chặn.
+  - LinkedIn có anti-bot mạnh: chạy ở mạng dân cư (residential IP), không dùng IP
+    datacenter; nếu nhận 403/429 thì giảm tần suất hoặc đổi IP. Khi không lấy được
+    dữ liệu, script ghi log lỗi và KHÔNG ghi bản ghi rỗng/ước đoán.
 
 Cách dùng:
     python scripts/scrape_linkedin.py --keywords "software developer" \
@@ -130,8 +130,8 @@ def main() -> int:
     kws = args.keywords or DEFAULT_KEYWORDS
     rows = scrape(kws, args.location, args.pages, today_vn())
     if not rows:
-        log.error("Không thu được job (bị chặn egress hoặc LinkedIn đổi markup). "
-                  "Chạy trên máy có internet mở. KHÔNG ghi dữ liệu giả.")
+        log.error("Không thu được job (bị chặn anti-bot hoặc LinkedIn đổi markup). "
+                  "Chạy ở mạng dân cư có internet mở; script không ghi bản ghi rỗng.")
         return 2
     if args.dry_run:
         log.info("[DRY-RUN] thu %d job, không ghi.", len(rows))

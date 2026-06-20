@@ -1,7 +1,7 @@
 # VTI Skill Market — Power BI Handoff
 
 Gói bàn giao để đội dev **dựng lại dashboard trong Power BI Desktop** với dữ liệu mới.
-Toàn bộ số liệu là dữ liệu thật đã làm sạch — **không bịa**.
+Toàn bộ số liệu là dữ liệu thật đã làm sạch.
 
 ## Nội dung gói
 

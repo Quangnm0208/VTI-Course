@@ -32,4 +32,4 @@ jupyter notebook notebooks/01_analysis.ipynb   # chạy phân tích đầy đủ
 ```
 
 Không có file raw, `src/03_analyze_data.py` vẫn chạy được và xuất các bảng summary
-từ bộ số liệu đã chốt (KHÔNG bịa dữ liệu — đó là kết quả thật đã tính từ khảo sát).
+từ bộ số liệu tổng hợp đã chốt (kết quả đã tính sẵn từ khảo sát gốc).

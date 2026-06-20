@@ -13,7 +13,7 @@ Vì sao GitHub API:
 Xác thực & rate limit:
     - Không token: 10 lượt search/phút, dễ bị giới hạn trên IP dùng chung.
     - Có GITHUB_TOKEN (Actions tự cấp / PAT cá nhân): 30 lượt/phút, ổn định.
-    Script tự backoff theo header X-RateLimit-Reset, KHÔNG bịa dữ liệu khi bị chặn.
+    Script tự backoff theo header X-RateLimit-Reset; khi bị chặn thì dừng, không ghi bản ghi rỗng.
 
 Đầu ra (data/raw/):
     github_tech_demand.csv   - mỗi dòng: skill, category, repo_count (aggregate)
@@ -120,7 +120,7 @@ def fetch_skill(session: requests.Session, skill: str, category: str,
 
         log.warning("  [%s] HTTP %s", skill, r.status_code)
         break
-    return -1, []   # -1 = không lấy được (không bịa)
+    return -1, []   # -1 = không lấy được (bỏ qua, không ghi)
 
 
 def main() -> int:
@@ -157,7 +157,7 @@ def main() -> int:
 
     if not demand_rows:
         log.error("Không thu được dữ liệu nào (có thể bị rate limit trên IP dùng chung). "
-                  "Hãy đặt GITHUB_TOKEN rồi chạy lại — KHÔNG ghi dữ liệu giả.")
+                  "Hãy đặt GITHUB_TOKEN rồi chạy lại.")
         return 2
 
     # Ghi 2 file: aggregate (demand) + record-level (repos)

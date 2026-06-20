@@ -7,7 +7,7 @@ và bỏ trống company/salary_status. Script này sửa tại chỗ (idempoten
   1. source_url '/sign_in?job=<slug>' -> canonical 'https://itviec.com/it/<slug>'
   2. company trống -> derive từ slug job
   3. salary 'Sign in to view salary'  -> salary_status='login_required'
-     (KHÔNG bịa số lương; chỉ ghi đúng trạng thái)
+     (không ước đoán lương; chỉ ghi đúng trạng thái)
   4. điền salary_currency / salary_status cho mọi dòng dựa trên text salary
 
 Cách dùng:

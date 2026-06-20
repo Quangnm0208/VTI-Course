@@ -10,7 +10,7 @@ Kính chào hội đồng. Đồ án của em trả lời một câu hỏi kinh 
 
 ## [2 phút] Dữ liệu & Phương pháp
 
-Em dùng ba nguồn bổ trợ nhau. **Thứ nhất, Stack Overflow Developer Survey** — file CSV 90 cột, 11.552 lập trình viên, 135 quốc gia — làm benchmark toàn cầu. **Thứ hai, ItViec job postings**, scrape hằng ngày bằng Playwright, làm proxy cho nhu cầu tuyển dụng tại Việt Nam; lưu ý ItViec ẩn lương sau đăng nhập nên trường lương được đánh dấu `login_required`, em không bịa con số. **Thứ ba, các cổng đào tạo** phản ánh nguồn cung khóa học hiện có (tùy chọn).
+Em dùng ba nguồn bổ trợ nhau. **Thứ nhất, Stack Overflow Developer Survey** — file CSV 90 cột, 11.552 lập trình viên, 135 quốc gia — làm benchmark toàn cầu. **Thứ hai, ItViec job postings**, scrape hằng ngày bằng Playwright, làm proxy cho nhu cầu tuyển dụng tại Việt Nam; lưu ý ItViec ẩn lương sau đăng nhập nên trường lương được đánh dấu `login_required` thay vì ước đoán. **Thứ ba, các cổng đào tạo** phản ánh nguồn cung khóa học hiện có (tùy chọn).
 
 Về chân dung mẫu: 96,2% làm full-time, kinh nghiệm coding chuyên nghiệp trung vị 5 năm, lương trung vị $57.844/năm, trung bình mỗi người dùng 5,2 ngôn ngữ và muốn học thêm 4,9. Em dùng ba kỹ thuật thống kê: **(1) đếm tần suất và tỷ lệ phần trăm**; **(2) growth-gap = số người muốn dùng năm tới trừ số người đang dùng**; và **(3) lương trung vị có rào chắn cỡ mẫu, winsorize tại $300k** vì lương tự khai có ngoại lai.
 

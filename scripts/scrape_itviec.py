@@ -219,7 +219,7 @@ def parse_job_card(card) -> Optional[Dict]:
             location = svg_loc.parent.get_text(" ", strip=True)
 
     # Lương: ItViec ẩn lương sau "Sign in to view salary" với khách vãng lai.
-    # Ta KHÔNG bịa số — chỉ phân loại trạng thái và parse khi có số thật.
+    # Không ước đoán lương — chỉ phân loại trạng thái và parse khi có số thật.
     salary_tag = card.find(class_=re.compile("salary"))
     salary_raw = salary_tag.get_text(strip=True) if salary_tag else "Negotiable"
     sal_status = salary_status_from_text(salary_raw)

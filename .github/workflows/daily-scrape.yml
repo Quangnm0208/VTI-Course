@@ -61,7 +61,7 @@ jobs:
           ENRICH: ${{ github.event.inputs.enrich || '200' }}
           # (Tùy chọn) cookie phiên đăng nhập ItViec để MỞ KHÓA lương bị ẩn.
           # Thêm tại Settings -> Secrets -> Actions -> ITVIEC_COOKIE. Không có
-          # secret thì salary_status='login_required' (không bịa số).
+          # secret thì salary_status='login_required' (giữ nguyên trạng thái, không ước đoán).
           ITVIEC_COOKIE: ${{ secrets.ITVIEC_COOKIE }}
           VND_PER_USD: ${{ vars.VND_PER_USD || '25000' }}
         run: |

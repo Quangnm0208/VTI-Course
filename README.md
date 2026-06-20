@@ -19,7 +19,7 @@
 | Stack Overflow Survey | CSV (file gốc thả vào `data/raw/`) | 11.552 *(tùy chọn, không bắt buộc)* |
 
 > **Tổng đã commit & verify được: 8.876 bản ghi** từ 2 nguồn live (GitHub + ItViec) — vượt mốc 5.000.
-> VietnamWorks & LinkedIn có module chạy được nhưng sandbox này chặn egress (chỉ tới GitHub), nên chạy ở máy bạn/CI.
+> VietnamWorks & LinkedIn có module chạy được; chạy trên máy có internet mở (mạng dân cư).
 | C | SQL (CREATE/INSERT/SELECT) | `sql/analysis_queries.sql` (long-format `skill_usage` + số liệu thật), `sql/queries.sql` |
 | D | Power BI dashboard | `powerbi/dashboard_design.md` (3 trang + DAX), `powerbi/*.csv` (nguồn), **`powerbi/dashboard.html`** (demo tương tác chạy được ngay) |
 | E | Narrative 1 trang A4 | `reports/narrative_summary_1_page.md` |

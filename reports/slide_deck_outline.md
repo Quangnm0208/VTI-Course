@@ -13,7 +13,7 @@
 - **Title:** Nguồn dữ liệu & quy trình phân tích
 - **Key message:** Ba nguồn bổ trợ nhau — benchmark toàn cầu, tín hiệu tuyển dụng Việt Nam và nguồn cung khóa học.
 - **Suggested visual:** Sơ đồ pipeline: Stack Overflow CSV (90 cột) + ItViec (Playwright) + Cổng đào tạo → Làm sạch → Thống kê → Power BI.
-- **Speaker notes:** Stack Overflow là benchmark toàn cầu; ItViec scrape hằng ngày làm proxy nhu cầu Việt Nam (lương ẩn sau đăng nhập, đánh dấu login_required — không bịa). Kỹ thuật thống kê: tần suất & %, growth-gap = desired − worked, lương trung vị winsorize tại $300k kèm rào chắn cỡ mẫu.
+- **Speaker notes:** Stack Overflow là benchmark toàn cầu; ItViec scrape hằng ngày làm proxy nhu cầu Việt Nam (lương ẩn sau đăng nhập, đánh dấu login_required thay vì ước đoán). Kỹ thuật thống kê: tần suất & %, growth-gap = desired − worked, lương trung vị winsorize tại $300k kèm rào chắn cỡ mẫu.
 
 ## Slide 3 — Tổng quan bộ dữ liệu
 - **Title:** Chân dung người trả lời

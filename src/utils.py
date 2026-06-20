@@ -8,7 +8,7 @@ Toàn bộ hàm theo đúng yêu cầu đề bài:
 
 Nguyên tắc:
     - Không hard-code đường dẫn tuyệt đối (nhận path qua tham số).
-    - Kiểm tra file tồn tại, xử lý thiếu dữ liệu, không bịa số.
+    - Kiểm tra file tồn tại, xử lý thiếu dữ liệu rõ ràng.
     - Mỗi bước có input/output rõ ràng + comment.
 """
 from __future__ import annotations
