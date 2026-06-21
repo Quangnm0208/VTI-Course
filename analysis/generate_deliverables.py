@@ -140,9 +140,9 @@ def build_dashboard(tables: dict[str, pd.DataFrame]) -> None:
         ("Developers khảo sát", f"{int(ov['Total respondents']):,}"),
         ("Quốc gia", f"{int(ov['Countries covered'])}"),
         ("Median salary", f"${int(ov['Median salary USD']):,}"),
-        ("Ngôn ngữ Emerging", "TypeScript · Go · Kotlin · Rust"),
-        ("Database trục chính", "PostgreSQL (+5.6%)"),
-        ("IDE chuẩn onboarding", "VS Code (~55%)"),
+        ("Ngôn ngữ Emerging", "Rust · Go · Zig · Elixir"),
+        ("Database trục chính", "PostgreSQL (dẫn đầu)"),
+        ("IDE chuẩn onboarding", "VS Code (kỳ SO gần nhất)"),
     ]
     cards = "".join(
         f'<div class="card"><div class="k">{k}</div><div class="v">{v}</div></div>'

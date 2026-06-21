@@ -133,7 +133,9 @@ def main():
     exp = pd.to_numeric(df[COLS["exp"]], errors="coerce")
     sal = pd.to_numeric(df[COLS["salary"]], errors="coerce").clip(upper=SALARY_CAP)
     vn = int(df[COLS["country"]].astype(str).str.contains("Viet Nam|Vietnam", case=False, na=False).sum())
-    ft = round((df[COLS["employment"]].astype(str).str.contains("Employed, full-time", na=False)).mean() * 100, 1)
+    # SO 2025 gộp việc làm thành "Employed" (không tách full-time). Dùng tỷ lệ
+    # respondent có việc làm chính thức ("Employed") làm tín hiệu mẫu chuyên nghiệp.
+    ft = round((df[COLS["employment"]].astype(str).str.strip() == "Employed").mean() * 100, 1)
     lw = df[COLS["lang_w"]].fillna("").astype(str).apply(lambda s: len([x for x in s.split(SEP) if x.strip()]))
     ld = df[COLS["lang_d"]].fillna("").astype(str).apply(lambda s: len([x for x in s.split(SEP) if x.strip()]))
 
