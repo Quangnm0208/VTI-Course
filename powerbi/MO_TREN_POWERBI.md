@@ -33,7 +33,7 @@ Dữ liệu đã làm sẵn trong `powerbi/*.csv` — chỉ cần import rồi k
 | Lương theo ngôn ngữ | Bar | Axis `salary_by_language[language]`, Value `median_salary` |
 | IDE phổ biến | Bar | Axis `ide_overall[ide]`, Value `usage_pct` |
 | Cầu kỹ năng Việt Nam | Bar | Axis `vn_itviec_skill_demand[skill]`, Value `pct_of_jobs` |
-| Lương VN vs toàn cầu | Bar | Axis `vn_salary_benchmark[tier]`, Value `annual_usd_max` (thêm reference line $57.844) |
+| Lương VN vs toàn cầu | Bar | Axis `vn_salary_benchmark[tier]`, Value `annual_usd_max` (thêm reference line 75.320) |
 | Ưu tiên tuyển dụng | Bar | Axis `role_priority[role]`, Value `hiring_priority_score` |
 | KPI Total Respondents… | Card | `dataset_overview[value]` (lọc `metric = "Total respondents"`) |
 

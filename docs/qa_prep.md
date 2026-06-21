@@ -55,7 +55,7 @@
 
 **Q8: Sao em chắc dữ liệu chính xác? Có bias không?**
 > Có 2 bias em nhận thức rõ:
-> (1) **Stack Overflow Survey** lệch về dev biết tiếng Anh, online —
+> (1) **Stack Overflow Developer Survey 2025** lệch về dev biết tiếng Anh, online —
 > không đại diện toàn bộ dev VN.
 > (2) **ItViec** lệch về job senior + công ty IT lớn — không phản ánh
 > startup nhỏ.
@@ -69,7 +69,7 @@
 > này.
 
 **Q10: SQL không phải ngôn ngữ lập trình thuần, sao em xếp vào?**
-> Em theo cách phân loại của Stack Overflow Survey — họ gộp SQL vào
+> Em theo cách phân loại của Stack Overflow Developer Survey 2025 — họ gộp SQL vào
 > `language_worked_with`. Có thể tranh luận, nhưng từ góc độ thị trường
 > tuyển dụng, SQL là yêu cầu bắt buộc với Backend & Data → việc xếp
 > chung là hợp lý.

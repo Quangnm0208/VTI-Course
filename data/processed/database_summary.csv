@@ -1,13 +1,31 @@
 ﻿skill_name,count,growth_pct,signal,category
-PostgreSQL,4153,5.6,Stable,database
-MongoDB,3058,21.1,Emerging,database
-Redis,2536,33.5,Emerging,database
-MySQL,5549,-40.0,Declining,database
-Elasticsearch,1980,46.4,Emerging,database
-Microsoft SQL Server,4170,-34.1,Declining,database
-SQLite,3292,-25.1,Declining,database
-Firebase,1343,25.0,Emerging,database
-MariaDB,1724,-18.8,Stable,database
-DynamoDB,839,25.9,Emerging,database
-Cassandra,403,153.8,Emerging,database
-Oracle,1761,-50.0,Declining,database
+PostgreSQL,14529,-18.3,Stable,database
+SQLite,9798,-26.7,Declining,database
+Redis,7316,-17.8,Stable,database
+MySQL,10581,-51.6,Declining,database
+MongoDB,6267,-29.5,Declining,database
+Microsoft SQL Server,7871,-51.1,Declining,database
+Elasticsearch,4347,-24.4,Declining,database
+MariaDB,5862,-44.7,Declining,database
+Dynamodb,2551,-31.8,Declining,database
+Supabase,1558,4.0,Stable,database
+DuckDB,863,66.4,Emerging,database
+BigQuery,1705,-19.6,Stable,database
+Oracle,2761,-54.4,Declining,database
+Valkey,632,96.2,Emerging,database
+Cassandra,766,58.5,Emerging,database
+Snowflake,1079,-1.0,Stable,database
+Firebase Realtime Database,1299,-22.2,Declining,database
+Cosmos DB,1190,-17.0,Stable,database
+Cloud Firestore,1494,-34.4,Declining,database
+Neo4J,691,40.7,Emerging,database
+Databricks SQL,895,-2.3,Stable,database
+Clickhouse,627,34.6,Emerging,database
+InfluxDB,963,-25.1,Declining,database
+Amazon Redshift,611,12.1,Stable,database
+Cockroachdb,262,141.2,Emerging,database
+H2,1303,-52.4,Declining,database
+Pocketbase,262,55.3,Emerging,database
+Microsoft Access,1244,-70.8,Declining,database
+IBM DB2,615,-46.3,Declining,database
+Datomic,148,83.8,Emerging,database

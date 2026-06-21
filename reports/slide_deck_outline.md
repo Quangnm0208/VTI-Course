@@ -1,12 +1,12 @@
 # Slide Deck Outline — Một ngày của Data Analyst: Phân tích xu hướng kỹ năng IT
-*10 slide, dùng số liệu thực từ Stack Overflow Developer Survey (11.552 lập trình viên, 135 quốc gia).*
+*10 slide, dùng số liệu thực từ Stack Overflow Developer Survey 2025 (49.191 lập trình viên, 177 quốc gia).*
 
 ---
 
 ## Slide 1 — Tiêu đề & Bối cảnh
 - **Title:** Một ngày của Data Analyst — Phân tích xu hướng kỹ năng IT cho VTI Academy
-- **Key message:** Phân tích 11.552 lập trình viên trên 135 quốc gia để định hướng chương trình đào tạo bám sát nhu cầu thị trường.
-- **Suggested visual:** Ảnh bìa + 3 con số lớn (11.552 dev / 135 quốc gia / lương trung vị $57.844).
+- **Key message:** Phân tích 49.191 lập trình viên trên 177 quốc gia để định hướng chương trình đào tạo bám sát nhu cầu thị trường.
+- **Suggested visual:** Ảnh bìa + 3 con số lớn (49.191 dev / 177 quốc gia / lương trung vị 75.320).
 - **Speaker notes:** VTI Academy cần đào tạo đúng kỹ năng đang tăng nhu cầu. Dự án trả lời ngôn ngữ/database/công cụ nào nên ưu tiên và vai trò nào nên dồn tuyển sinh. Mục tiêu là quyết định dựa trên dữ liệu, không cảm tính.
 
 ## Slide 2 — Phương pháp & Pipeline dữ liệu
@@ -19,7 +19,7 @@
 - **Title:** Chân dung người trả lời
 - **Key message:** Mẫu nghiêng về phương Tây, làm full-time, nhiều kinh nghiệm — mạnh để làm benchmark toàn cầu.
 - **Suggested visual:** Bản đồ/biểu đồ cột phân bổ quốc gia + thẻ chỉ số.
-- **Speaker notes:** 96,2% làm full-time, kinh nghiệm coding chuyên nghiệp trung vị 5 năm, trung bình dùng 5,2 ngôn ngữ và muốn học 4,9. Top quốc gia: Mỹ 27,5%, Ấn Độ 7,9%, Anh 7,3%, Đức 6,2%. Việt Nam chỉ 12 phản hồi nên không kết luận riêng cho Việt Nam từ khảo sát.
+- **Speaker notes:** 96,2% làm full-time, kinh nghiệm coding chuyên nghiệp trung vị 5 năm, trung bình dùng 5,2 ngôn ngữ và muốn học 4,9. Top quốc gia: Mỹ 27,5%, Ấn Độ 7,9%, Anh 7,3%, Đức 6,2%. Việt Nam chỉ 145 phản hồi nên không kết luận riêng cho Việt Nam từ khảo sát.
 
 ## Slide 4 — Xu hướng ngôn ngữ lập trình
 - **Title:** Ngôn ngữ nào đang được dùng nhiều nhất?
@@ -48,17 +48,17 @@
 ## Slide 8 — Tổng quan Dashboard Power BI
 - **Title:** Dashboard tương tác cho ra quyết định
 - **Key message:** Dashboard cho phép lọc theo vai trò, kỹ năng, lương để Academy ra quyết định nhanh.
-- **Suggested visual:** Screenshot Power BI: KPI cards (11.552 dev, lương trung vị $57.844), biểu đồ growth-gap, bảng lương theo ngôn ngữ và vai trò.
+- **Suggested visual:** Screenshot Power BI: KPI cards (49.191 dev, lương trung vị 75.320), biểu đồ growth-gap, bảng lương theo ngôn ngữ và vai trò.
 - **Speaker notes:** Dashboard gồm trang tổng quan, xu hướng ngôn ngữ/database, lương theo ngôn ngữ (Clojure $93k, Go $80k, Python $64k... PHP $43k) và ưu tiên vai trò. Người dùng tự lọc theo nhu cầu thay vì đọc báo cáo tĩnh, hỗ trợ quyết định lặp lại theo mùa tuyển sinh.
 
 ## Slide 9 — Khuyến nghị chiến lược
 - **Title:** Ba khuyến nghị cho VTI Academy
 - **Key message:** Tập trung lõi vào Python/TypeScript/PostgreSQL, mở elective kỹ năng nóng, và xác thực Việt Nam bằng ItViec.
 - **Suggested visual:** 3 thẻ khuyến nghị kèm vai trò ưu tiên (Full-stack 6.928/$59.000/Ưu tiên 1; Back-end 6.290/$56.715; DevOps $71.036).
-- **Speaker notes:** (1) Tái cấu trúc lộ trình cốt lõi quanh Python+TypeScript+PostgreSQL, giảm PHP/Java thuần. (2) Mở elective ngắn cho Go/Rust/Kotlin/MongoDB/Redis/DevOps, định giá premium nhờ lương cao. (3) Mọi quyết định cho Việt Nam phải xác thực bằng ItViec, không suy từ 12 mẫu khảo sát.
+- **Speaker notes:** (1) Tái cấu trúc lộ trình cốt lõi quanh Python+TypeScript+PostgreSQL, giảm PHP/Java thuần. (2) Mở elective ngắn cho Go/Rust/Kotlin/MongoDB/Redis/DevOps, định giá premium nhờ lương cao. (3) Mọi quyết định cho Việt Nam phải xác thực bằng ItViec, không suy từ 145 mẫu khảo sát.
 
 ## Slide 10 — Q&A
 - **Title:** Cảm ơn — Hỏi & Đáp
 - **Key message:** Sẵn sàng trao đổi về nguồn dữ liệu, phương pháp và tính đại diện cho Việt Nam.
 - **Suggested visual:** Slide cảm ơn + thông tin liên hệ + nhắc lại 3 con số chủ chốt.
-- **Speaker notes:** Chủ động nêu giới hạn cỡ mẫu Việt Nam (12 phản hồi) và cách khắc phục bằng ItViec để thể hiện tư duy phản biện. Sẵn sàng giải thích kỹ thuật xử lý multi-select và winsorize lương.
+- **Speaker notes:** Chủ động nêu giới hạn cỡ mẫu Việt Nam (145 phản hồi) và cách khắc phục bằng ItViec để thể hiện tư duy phản biện. Sẵn sàng giải thích kỹ thuật xử lý multi-select và winsorize lương.

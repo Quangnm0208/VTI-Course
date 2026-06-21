@@ -1,9 +1,9 @@
 ﻿role,developer_count,median_salary,hiring_priority_score,priority_band
-Full-stack Developer,6928,59000,72.9,Priority 1
-Back-end Developer,6290,56715,65.9,Priority 2
-DevOps Specialist,1639,71036,46.1,Priority 2
-Front-end Developer,3920,53437,45.2,Priority 2
-Product/BA,1179,61650,33.3,Priority 3
-Data/BI Analyst,802,61872,30.8,Priority 3
-Data Scientist / ML,803,60000,28.9,Priority 3
-Mobile Developer,1959,46152,23.5,Priority 3
+Full-stack Developer,12351,71078.0,77.2,Priority 1
+Back-end Developer,6453,78616.0,46.1,Priority 2
+Product/BA,1273,122171.0,35.4,Priority 3
+DevOps Specialist,1053,87011.0,18.4,Priority 3
+Data Scientist / ML,574,81210.0,13.0,Priority 3
+Mobile Developer,1391,69609.0,12.6,Priority 3
+Front-end Developer,1974,61362.0,12.3,Priority 3
+Data/BI Analyst,351,55000.0,0.0,Priority 3

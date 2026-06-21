@@ -36,6 +36,6 @@ VTI-PowerBI-Handoff/
 3. Import 15 CSV trong `data/` (UTF-8, delimiter = comma) → dựng theo spec → Save As `.pbix`.
 
 ## Quy ước số liệu (đọc kỹ — tránh hiểu nhầm)
-- **Toàn cầu** = Stack Overflow Developer Survey (11.552 dev / 135 quốc gia / median $57.844).
+- **Toàn cầu** = Stack Overflow Developer Survey 2025 (49.191 dev / 177 quốc gia / median 75.320).
 - **Việt Nam (cầu)** = scrape ItViec ngày **2026-05-28**, 1.200 JD. `pct_of_jobs` = % JD có nhắc kỹ năng đó.
-- **Việt Nam (lương)**: ItViec **ẩn lương** — 0/1.200 JD công khai. Vì vậy số lương VN trong `vn_salary_benchmark.csv` lấy từ **báo cáo công khai TopDev / Reco / Glassdoor 2024–2026** (cột `source`), KHÔNG suy từ ItViec. Mốc toàn cầu $57.844 từ Stack Overflow.
+- **Việt Nam (lương)**: ItViec **ẩn lương** — 0/1.200 JD công khai. Vì vậy số lương VN trong `vn_salary_benchmark.csv` lấy từ **báo cáo công khai TopDev / Reco / Glassdoor 2024–2026** (cột `source`), KHÔNG suy từ ItViec. Mốc toàn cầu 75.320 từ Stack Overflow.

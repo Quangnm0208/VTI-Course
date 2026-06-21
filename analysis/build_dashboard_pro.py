@@ -143,7 +143,7 @@ body{margin:0;font-family:'Inter',system-ui,'Segoe UI',sans-serif;background:var
      <button data-p="vietnam"><span class="num">03</span> Việt Nam · ItViec</button>
      <button data-p="strategy"><span class="num">04</span> Khuyến nghị</button>
    </nav>
-   <div class="foot">Nguồn dữ liệu thực tế: <b>Stack Overflow Survey</b> 11.552 dev / 135 quốc gia · <b>GitHub API</b> 7.600 repo (nhu cầu công nghệ) · <b>ItViec</b> 1.200 JD (610 job unique, 29/05/2026). Tổng ~20.300 bản ghi từ 3 nguồn. "1.200" là riêng ItViec, không phải toàn bộ.</div>
+   <div class="foot">Nguồn dữ liệu thực tế: <b>Stack Overflow Developer Survey 2025</b> 49.191 dev / 177 quốc gia (VN 145) · <b>GitHub API</b> 7.600 repo · <b>ItViec</b> 1.200 JD. IDE lấy từ kỳ khảo sát gần nhất có hỏi (SO 2025 bỏ câu hỏi IDE).</div>
  </aside>
  <main class="main">
    <div class="head">
@@ -247,7 +247,7 @@ function renderDemand(){
     marker:{color:PAL.emerging},text:sal.map(r=>'$'+Math.round(r.median_salary/1000)+'k'),textposition:'auto'}],baseLayout('Lương trung vị theo ngôn ngữ (USD)'),CFG);
   const ide=[...D.ide].sort((a,b)=>a.usage_pct-b.usage_pct);
   Plotly.newPlot('d_ide',[{type:'bar',orientation:'h',x:ide.map(r=>r.usage_pct),y:ide.map(r=>r.ide),
-    marker:{color:PAL.primary},text:ide.map(r=>r.usage_pct+'%'),textposition:'auto'}],baseLayout('IDE phổ biến nhất (%)'),CFG);
+    marker:{color:PAL.primary},text:ide.map(r=>r.usage_pct+'%'),textposition:'auto'}],baseLayout('IDE phổ biến nhất (% · kỳ SO gần nhất có hỏi IDE)'),CFG);
   // ide by role -> small table style heat via bars
   const roles=[...new Set(D.role.map(r=>r.role))];
   document.getElementById('d_iderole').innerHTML =

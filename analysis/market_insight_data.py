@@ -1,41 +1,67 @@
 """
 market_insight_data.py — Bảng số liệu phân tích đã chốt (single source of truth).
 
-Toàn bộ con số trong file này được tính trực tiếp từ khảo sát Stack Overflow
-(Final Project.csv, 11.552 developer / 135 quốc gia) trong notebook
-`vti_hr_curriculum_market_insight.ipynb`. Tách riêng ra đây để Dashboard, SQL,
-PowerPoint và Narrative summary CÙNG dùng một bộ số -> không lệch nhau.
+Số liệu được tính từ khảo sát Stack Overflow Developer Survey (bản mới nhất) qua
+recompute_from_survey.py -> analysis/market_data.json; nếu thiếu file đó thì dùng
+số mặc định bên dưới. Tách riêng ra đây để Dashboard, SQL, PowerPoint và Narrative
+summary CÙNG dùng một bộ số -> không lệch nhau.
 
 Mỗi hàm trả về một pandas.DataFrame sạch, tên cột snake_case.
 """
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
 import pandas as pd
+
+# Nếu có analysis/market_data.json (kết quả tính lại từ khảo sát mới nhất) thì các
+# bảng phụ thuộc dữ liệu sẽ lấy số từ đó; nếu không, dùng số mặc định bên dưới.
+# -> Đổi data chỉ cần chạy lại recompute_from_survey.py, không sửa file này.
+_LIVE_PATH = Path(__file__).resolve().parent / "market_data.json"
+_LIVE: dict = {}
+if _LIVE_PATH.exists():
+    try:
+        _LIVE = json.loads(_LIVE_PATH.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        _LIVE = {}
+
+
+def _live_df(name: str, columns: list[str]) -> pd.DataFrame | None:
+    rows = _LIVE.get(name)
+    if not rows:
+        return None
+    return pd.DataFrame(rows)[columns]
 
 
 # -----------------------------------------------------------------------------
 # 0. Tổng quan dữ liệu (KPI cards)
 # -----------------------------------------------------------------------------
 def dataset_overview() -> pd.DataFrame:
-    return pd.DataFrame(
-        [
-            ("Total respondents", 11552, "Đủ lớn để đọc tín hiệu thị trường toàn cầu."),
-            ("Countries covered", 135, "Benchmark toàn cầu, không chỉ một thị trường."),
-            ("Viet Nam responses", 12, "Mẫu VN nhỏ -> phải kiểm chứng nội địa."),
-            ("Median salary USD", 57844, "Dùng trung vị làm mốc tham chiếu lương."),
-            ("Median professional coding years", 5, "Mẫu thiên về dev chuyên nghiệp tầm trung."),
-            ("Employed full-time percentage", 96.2, "Tín hiệu phù hợp tuyển dụng chính quy."),
-            ("Avg languages worked per respondent", 5.2, "Dev hiện đại là polyglot."),
-            ("Avg languages desired per respondent", 4.9, "Ứng viên muốn học đa kỹ năng."),
-        ],
-        columns=["metric", "value", "hr_meaning"],
-    )
+    base = [
+        ("Total respondents", 11552, "Đủ lớn để đọc tín hiệu thị trường toàn cầu."),
+        ("Countries covered", 135, "Benchmark toàn cầu, không chỉ một thị trường."),
+        ("Viet Nam responses", 12, "Mẫu VN nhỏ -> phải kiểm chứng nội địa."),
+        ("Median salary USD", 57844, "Dùng trung vị làm mốc tham chiếu lương."),
+        ("Median professional coding years", 5, "Mẫu thiên về dev chuyên nghiệp tầm trung."),
+        ("Employed full-time percentage", 96.2, "Tín hiệu phù hợp tuyển dụng chính quy."),
+        ("Average languages worked per respondent", 5.2, "Dev hiện đại là polyglot."),
+        ("Average languages desired per respondent", 4.9, "Ứng viên muốn học đa kỹ năng."),
+    ]
+    live = {m: v for m, v in _LIVE.get("dataset_overview", [])}
+    rows = [(m, live.get(m, dv), hm) for m, dv, hm in base]
+    return pd.DataFrame(rows, columns=["metric", "value", "hr_meaning"])
 
 
 # -----------------------------------------------------------------------------
 # 1. Tín hiệu ngôn ngữ lập trình (đang dùng vs muốn dùng năm sau)
 # -----------------------------------------------------------------------------
 def language_signal() -> pd.DataFrame:
+    cols = ["language", "worked", "desired_next_year", "net_change",
+            "growth_pct", "desired_market_pct", "signal"]
+    live = _live_df("language_signal", cols)
+    if live is not None:
+        return live
     rows = [
         # language, worked, desired_next_year, net_change, growth_pct, desired_market_pct, signal
         ("JavaScript", 8805, 6715, -2090, -23.7, 58.1, "Declining"),
@@ -65,6 +91,11 @@ def language_signal() -> pd.DataFrame:
 # 2. Tín hiệu cơ sở dữ liệu
 # -----------------------------------------------------------------------------
 def database_signal() -> pd.DataFrame:
+    cols = ["database", "worked", "desired_next_year", "net_change",
+            "growth_pct", "desired_market_pct", "signal"]
+    live = _live_df("database_signal", cols)
+    if live is not None:
+        return live
     rows = [
         ("PostgreSQL", 4153, 4386, 233, 5.6, 38.0, "Stable"),
         ("MongoDB", 3058, 3703, 645, 21.1, 32.1, "Emerging"),
@@ -131,6 +162,10 @@ def ide_overall() -> pd.DataFrame:
 # 4. Lương theo ngôn ngữ (USD, trung vị)
 # -----------------------------------------------------------------------------
 def salary_by_language() -> pd.DataFrame:
+    cols = ["language", "developer_count", "median_salary", "mean_salary", "mean_vs_global_pct"]
+    live = _live_df("salary_by_language", cols)
+    if live is not None:
+        return live
     rows = [
         ("Clojure", 152, 93404, 114203, 44.1),
         ("Go", 1060, 80000, 98923, 24.8),
@@ -161,6 +196,10 @@ def salary_by_language() -> pd.DataFrame:
 # 5. Ưu tiên tuyển dụng theo vai trò
 # -----------------------------------------------------------------------------
 def role_priority() -> pd.DataFrame:
+    cols = ["role", "developer_count", "median_salary", "hiring_priority_score", "priority_band"]
+    live = _live_df("role_priority", cols)
+    if live is not None:
+        return live
     rows = [
         ("Full-stack Developer", 6928, 59000, 72.9, "Priority 1"),
         ("Back-end Developer", 6290, 56715, 65.9, "Priority 2"),
@@ -182,6 +221,10 @@ def role_priority() -> pd.DataFrame:
 # 6. Phân bố theo quốc gia (top)
 # -----------------------------------------------------------------------------
 def country_distribution() -> pd.DataFrame:
+    cols = ["country", "count", "pct"]
+    live = _live_df("country_distribution", cols)
+    if live is not None:
+        return live
     rows = [
         ("United States", 3173, 27.5),
         ("India", 911, 7.9),

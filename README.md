@@ -16,7 +16,7 @@
 | **ItViec** | Web scraping Playwright (`scripts/scrape_itviec.py`) | **1.200 dòng** (`data/itviec_jobs.csv`) |
 | **VietnamWorks** | Public search API (`scripts/scrape_vietnamworks.py`) | chạy trên máy có mạng mở |
 | **LinkedIn** | Public `jobs-guest` endpoint (`scripts/scrape_linkedin.py`) | chạy trên máy có mạng mở |
-| Stack Overflow Survey | CSV (file gốc thả vào `data/raw/`) | 11.552 *(tùy chọn, không bắt buộc)* |
+| Stack Overflow Developer Survey 2025 | CSV (file gốc thả vào `data/raw/`) | 49.191 *(tùy chọn, không bắt buộc)* |
 
 > **Tổng đã commit & verify được: 8.876 bản ghi** từ 2 nguồn live (GitHub + ItViec) — vượt mốc 5.000.
 > VietnamWorks & LinkedIn có module chạy được; chạy trên máy có internet mở (mạng dân cư).

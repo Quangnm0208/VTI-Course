@@ -1,7 +1,7 @@
 # Power BI Dashboard - Đặc tả thiết kế (Build Specification)
 
-**Dự án:** Phân tích tín hiệu kỹ năng thị trường Lập trình viên (Stack Overflow Developer Survey)
-**Quy mô dữ liệu:** 11.552 lập trình viên / 135 quốc gia / median salary $57.844
+**Dự án:** Phân tích tín hiệu kỹ năng thị trường Lập trình viên (Stack Overflow Developer Survey 2025)
+**Quy mô dữ liệu:** 49.191 lập trình viên / 177 quốc gia / median salary 75.320
 **Mục tiêu báo cáo:** Biến dữ liệu khảo sát thành khuyến nghị tuyển dụng và lộ trình đào tạo cho VTI Academy.
 
 > File này là bản thiết kế để dựng báo cáo `.pbix` trong Power BI Desktop.
@@ -74,7 +74,7 @@ Total Respondents =
 CALCULATE(
     MAX(dataset_overview[value]),
     dataset_overview[metric] = "Total respondents"
-)   -- = 11.552
+)   -- = 49.191
 
 -- 2) Tổng số quốc gia
 Total Countries =
@@ -88,7 +88,7 @@ Median Salary =
 CALCULATE(
     MAX(dataset_overview[value]),
     dataset_overview[metric] = "Median salary USD"
-)   -- = 57.844
+)   -- = 75.320
 
 -- 4) Ngôn ngữ được mong muốn nhất (Top Desired Language) qua TOPN
 Top Desired Language =
@@ -130,7 +130,7 @@ Lang Median Salary = SUM(salary_by_language[median_salary])
 **KPI Cards (5 thẻ Card):**
 | # | Card | Trường / Measure | Nguồn |
 |---|---|---|---|
-| 1 | Total respondents = **11.552** | `[Total Respondents]` | dataset_overview |
+| 1 | Total respondents = **49.191** | `[Total Respondents]` | dataset_overview |
 | 2 | Total countries = **135** | `[Total Countries]` | dataset_overview |
 | 3 | Top current language = **JavaScript** | `[Top Current Language]` | language_signal |
 | 4 | Top desired language = **JavaScript** | `[Top Desired Language]` | language_signal |
@@ -192,6 +192,6 @@ Lang Median Salary = SUM(salary_by_language[median_salary])
 4. Tạo bảng `_Measures`, dán toàn bộ DAX ở mục 2.
 5. Dựng 3 trang report theo mục 3 (đặt tên trang: *Executive Overview*, *Skill Demand Deep Dive*, *Strategic Recommendation*).
 6. Bật **Sync Slicers** cho slicer Signal giữa Page 2 và Page 3.
-7. Đối chiếu các con số với `powerbi/dashboard.html` để đảm bảo khớp (11.552 / 135 / JavaScript / PostgreSQL / DevOps $71.036).
+7. Đối chiếu các con số với `powerbi/dashboard.html` để đảm bảo khớp (49.191 / 135 / JavaScript / PostgreSQL / DevOps $71.036).
 8. **File > Save As** → lưu `powerbi/skill_market_dashboard.pbix`. Đây là file nhị phân `.pbix` cần nộp.
 9. (Tuỳ chọn) **File > Export > PDF** để có bản báo cáo tĩnh kèm theo.

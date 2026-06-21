@@ -31,7 +31,7 @@
 **NỘI DUNG** *(layout 2 cột)*
 
 **Cột trái — Nguồn dữ liệu (3 nguồn):**
-- 📊 **Stack Overflow Survey** (CSV) — 80+ cột, 10.000+ developers toàn cầu
+- 📊 **Stack Overflow Developer Survey 2025** (CSV) — 80+ cột, 10.000+ developers toàn cầu
 - 💼 **ItViec** (Web Scraping) — tin tuyển dụng IT tại Việt Nam, cào hàng ngày
 - 🎓 **Training Portals** (API) — danh sách khóa học (Coursera, Udemy, edX)
 

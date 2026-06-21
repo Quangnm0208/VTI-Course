@@ -45,6 +45,6 @@ tiếp tại Việt Nam** (ItViec, cào tự động hàng ngày).
    chương trình đào tạo luôn cập nhật theo thị trường.
 
 ---
-*Nguồn dữ liệu: Stack Overflow Developer Survey + ItViec (scraping live).
+*Nguồn dữ liệu: Stack Overflow Developer Survey 2025 + ItViec (scraping live).
 Công cụ: Python (Pandas/Playwright/BeautifulSoup), SQL (SQLite), Power BI.
 Repo: github.com/Quangnm0208/VTI-Course*

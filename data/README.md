@@ -17,7 +17,7 @@ data/
 
 ## ⚠️ File còn thiếu để chạy pipeline THẬT end-to-end
 
-`Final Project.csv` (khảo sát Stack Overflow, ~11.552 dòng × 90 cột) **không được
+`Final Project.csv` (khảo sát Stack Overflow, ~49.191 dòng × 90 cột) **không được
 commit** vì là dữ liệu gốc. Notebook và toàn bộ con số tổng hợp đã được tính từ
 chính file này (kết quả lưu sẵn trong `notebooks/01_analysis.ipynb` và
 `analysis/market_insight_data.py`).

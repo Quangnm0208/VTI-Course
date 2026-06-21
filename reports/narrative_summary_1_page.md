@@ -4,7 +4,7 @@
 VTI Academy cần định hướng chương trình đào tạo bám sát nhu cầu tuyển dụng thực tế của thị trường lập trình viên. Dự án phân tích dữ liệu khảo sát toàn cầu để trả lời: ngôn ngữ, cơ sở dữ liệu và công cụ nào đang lên, vai trò nào nên ưu tiên tuyển sinh, và lương phản ánh nhu cầu ra sao — từ đó giúp Academy ưu tiên ngân sách xây khóa học và marketing tuyển sinh.
 
 ## 2. Nguồn dữ liệu & phương pháp
-- **Stack Overflow Developer Survey** (benchmark toàn cầu, CSV 90 cột): 11.552 lập trình viên, 135 quốc gia.
+- **Stack Overflow Developer Survey 2025** (benchmark toàn cầu, CSV 90 cột): 49.191 lập trình viên, 177 quốc gia.
 - **ItViec job postings** (proxy nhu cầu tuyển dụng Việt Nam, scrape hằng ngày bằng Playwright; lương bị ẩn sau đăng nhập nên đánh dấu `login_required` thay vì ước đoán).
 - **Cổng đào tạo** (nguồn cung khóa học, tùy chọn).
 - **Kỹ thuật thống kê:** (1) đếm tần suất & tỷ lệ phần trăm; (2) net-change / growth-gap = `desired_next_year − worked_with`; (3) lương trung vị có rào chắn cỡ mẫu, winsorize tại $300k vì lương tự khai có ngoại lai.
@@ -22,6 +22,6 @@ Cột multi-select (ngôn ngữ, database, IDE) được tách theo dấu `;` th
 ## 5. Khuyến nghị chiến lược
 1. **Tái cấu trúc lộ trình cốt lõi quanh Python + TypeScript + PostgreSQL**, giảm dần PHP/Java thuần — bám đúng nhu cầu tăng trưởng và vai trò Full-stack/Back-end ưu tiên 1–2.
 2. **Mở các khóa elective ngắn cho kỹ năng tăng trưởng nóng** (Go, Rust, Kotlin, MongoDB/Redis, DevOps) hướng đến học viên đã có nền, tận dụng mức lương cao để định giá premium.
-3. **Xác thực mọi quyết định cho thị trường Việt Nam bằng ItViec**, không kết luận từ 12 mẫu khảo sát Việt Nam; dùng Stack Overflow làm benchmark toàn cầu, ItViec làm tín hiệu địa phương.
+3. **Xác thực mọi quyết định cho thị trường Việt Nam bằng ItViec**, không kết luận từ 145 mẫu khảo sát Việt Nam; dùng Stack Overflow làm benchmark toàn cầu, ItViec làm tín hiệu địa phương.
 
-> **Giới hạn quan trọng:** Việt Nam chỉ có 12 phản hồi khảo sát → coi Stack Overflow là benchmark toàn cầu, xác thực đặc thù Việt Nam bằng ItViec. Không kết luận quá mức về Việt Nam.
+> **Giới hạn quan trọng:** Việt Nam chỉ có 145 phản hồi khảo sát → coi Stack Overflow là benchmark toàn cầu, xác thực đặc thù Việt Nam bằng ItViec. Không kết luận quá mức về Việt Nam.

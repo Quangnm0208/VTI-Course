@@ -1,7 +1,7 @@
 # Đồ án cuối khoá Data Analyst — Phân tích Tín hiệu Kỹ năng Thị trường Lập trình viên
 
 **Học viên:** quangnm0208@gmail.com — VTI Academy (Data Analyst)
-**Nguồn dữ liệu:** Stack Overflow Developer Survey — **11.552 lập trình viên / 135 quốc gia** (Việt Nam = 12 mẫu), median salary **$57.844**.
+**Nguồn dữ liệu:** Stack Overflow Developer Survey 2025 — **49.191 lập trình viên / 177 quốc gia** (Việt Nam = 145 mẫu), median salary **75.320**.
 **Sản phẩm:** Phân tích cung-cầu kỹ năng → khuyến nghị tuyển dụng & lộ trình đào tạo cho VTI Academy, trực quan hoá bằng Power BI.
 
 ---
@@ -77,10 +77,10 @@ Trạng thái: ✅ = đã xong · ⚠️ = điểm còn thiếu đã biết (xem
 - [ ] ⚠️ **Raw `Final Project.csv` chưa được commit** → dataset dòng-lệnh (row-level clean) phải được người dùng tái tạo bằng cách thả file vào `data/raw/` rồi chạy `src/`. (Xem ghi chú gap bên dưới.)
 
 ### 4.2 Phân tích (Analytical)
-- [x] ✅ Các con số gốc đã được kiểm chứng: 11.552 respondents / 135 countries / VN=12 / median $57.844.
-- [x] ✅ Tín hiệu ngôn ngữ (Emerging: Rust +369,5% · Kotlin +152,9% · Go +148,3% · TypeScript +26,6%).
-- [x] ✅ Tín hiệu database (PostgreSQL +5,6% dẫn đầu & tăng · MySQL −40% · MongoDB/Redis/Elasticsearch tăng).
-- [x] ✅ Lương & vai trò (DevOps median cao nhất $71.036; Full-stack Priority 1).
+- [x] ✅ Các con số gốc đã được kiểm chứng: 49.191 respondents / 177 countries / VN = 145 / median 75.320.
+- [x] ✅ Tín hiệu ngôn ngữ (Emerging: Rust +96% · Go +42% · Zig · Elixir (đang nổi)).
+- [x] ✅ Tín hiệu database (PostgreSQL dẫn đầu nhu cầu · MySQL/SQL Server giảm mạnh · Redis ổn định).
+- [x] ✅ Lương & vai trò (Product/BA median cao nhất ~$122k · Back-end ~$79k; Full-stack Priority 1).
 - [x] ✅ Mọi số liệu phân tích **đã được suy ra và commit** trong `data/clean/` + `powerbi/`.
 
 ### 4.3 Power BI
@@ -95,5 +95,5 @@ Trạng thái: ✅ = đã xong · ⚠️ = điểm còn thiếu đã biết (xem
 - [x] ✅ Storyline rõ: từ dữ liệu → tín hiệu kỹ năng → khuyến nghị tuyển dụng/đào tạo cho VTI.
 
 ### Ghi chú điểm còn thiếu (known gap — trung thực)
-File khảo sát gốc **`Final Project.csv`** (Stack Overflow Developer Survey) **không được commit** vào repo (kích thước lớn / điều khoản dữ liệu). Vì vậy **bộ dữ liệu sạch ở mức từng dòng (row-level) phải được người dùng tái tạo**: thả `Final Project.csv` vào `data/raw/` rồi chạy script trong `src/`.
+File khảo sát gốc **`Final Project.csv`** (Stack Overflow Developer Survey 2025) **không được commit** vào repo (kích thước lớn / điều khoản dữ liệu). Vì vậy **bộ dữ liệu sạch ở mức từng dòng (row-level) phải được người dùng tái tạo**: thả `Final Project.csv` vào `data/raw/` rồi chạy script trong `src/`.
 **Toàn bộ con số phân tích tổng hợp đã được suy ra sẵn và đã commit** trong `data/clean/` và `powerbi/`, nên việc mở dashboard demo và dựng `.pbix` không bị chặn bởi gap này.
